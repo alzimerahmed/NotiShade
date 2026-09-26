@@ -1,0 +1,16 @@
+.gradle/
+.kotlin/
+build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+/captures/
+
+# Local agent/editor settings; machine-specific paths, not project config.
+.claude/
+
+# Signing material must never be committed.
+*.jks
+*.keystore
+keystore.properties

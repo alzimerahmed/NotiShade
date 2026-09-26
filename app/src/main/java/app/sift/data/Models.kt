@@ -1,0 +1,150 @@
+package app.sift.data
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class Category(val label: String, val description: String) {
+    PROMO("Promotions", "Offers, deals, coupons and marketing pushes"),
+    RECOMMENDATIONS("Recommendations", "Suggestions, trending and \"for you\" picks"),
+    NEWS("News & content", "Headlines, new posts, episodes and live updates"),
+    SOCIAL("Social activity", "Likes, comments, follows and mentions"),
+    MESSAGES("Messages", "Chats, direct messages and email"),
+    CALLS("Calls", "Incoming, missed calls and voicemail"),
+    ORDERS("Orders & delivery", "Order status, shipping, rides and bookings"),
+    PAYMENTS("Payments", "Transactions, bills, bank and wallet alerts"),
+    SECURITY("Security", "OTPs, sign-ins and account alerts"),
+    REMINDERS("Reminders", "Alarms, timers, calendar and tasks"),
+    MEDIA("Media & ongoing", "Playback, navigation and running services"),
+    SYSTEM("Updates & system", "Downloads, sync, backups and errors"),
+    OTHER("Other", "Channels that didn't match any category"),
+}
+
+@Serializable
+enum class ChannelAction(val label: String, val description: String, val verb: String, val importance: Int) {
+    POPUP("Pop up", "Sound, and appears on screen", "Set to pop up", NotificationManager.IMPORTANCE_HIGH),
+    ALERT("Alert", "Sound or vibration", "Allowed", NotificationManager.IMPORTANCE_DEFAULT),
+    SILENT("Silent", "In the shade, without sound", "Silenced", NotificationManager.IMPORTANCE_LOW),
+    MINIMIZE("Minimized", "Collapsed at the bottom of the shade", "Minimized", NotificationManager.IMPORTANCE_MIN),
+
+    // Minimized so Android still delivers them to us; the listener removes each one on arrival and logs it.
+    BLOCK("Blocked", "Never shown, kept in Logs", "Blocked", NotificationManager.IMPORTANCE_MIN),
+}
+
+fun importanceLabel(importance: Int) = when (importance) {
+    NotificationManager.IMPORTANCE_NONE -> "Blocked"
+    NotificationManager.IMPORTANCE_MIN -> "Minimized"
+    NotificationManager.IMPORTANCE_LOW -> "Silent"
+    NotificationManager.IMPORTANCE_DEFAULT -> "Alerting"
+    NotificationManager.IMPORTANCE_HIGH, NotificationManager.IMPORTANCE_MAX -> "Pop-up"
+    else -> "Unspecified"
+}
+
+fun keyOf(pkg: String, channelId: String) = "$pkg|$channelId"
+
+/** Channels + groups exactly as read from the system for one app. */
+data class RawApp(
+    val pkg: String,
+    val uid: Int,
+    val label: String,
+    val system: Boolean,
+    val appCategory: Int,
+    val error: String?,
+    val channels: List<NotificationChannel>,
+    val groupNames: Map<String, String>,
+)
+
+data class ChannelInfo(
+    val pkg: String,
+    val uid: Int,
+    val appLabel: String,
+    val channel: NotificationChannel,
+    val groupName: String?,
+    val category: Category,
+    val confidence: Int,
+    val overridden: Boolean,
+    /** Blocked by us: minimized in the system, removed and logged on arrival. */
+    val logged: Boolean,
+) {
+    val key get() = keyOf(pkg, channel.id)
+}
+
+data class AppInfo(
+    val pkg: String,
+    val uid: Int,
+    val label: String,
+    val system: Boolean,
+    val error: String?,
+    val channels: List<ChannelInfo>,
+)
+
+@Serializable
+data class ChannelChange(
+    val pkg: String,
+    val uid: Int,
+    val channelId: String,
+    val channelName: String,
+    val before: Int,
+    val after: Int,
+    val loggedBefore: Boolean = false,
+    val loggedAfter: Boolean = false,
+)
+
+@Serializable
+data class Batch(val id: Long, val time: Long, val title: String, val changes: List<ChannelChange>)
+
+@Serializable
+enum class RuleAction(val label: String, val description: String) {
+    DISMISS("Remove", "Removed as soon as it arrives, kept in Logs"),
+    SNOOZE("Snooze 1 hour", "Hidden for an hour, then shown again"),
+}
+
+@Serializable
+data class Rule(
+    val id: Long,
+    val name: String,
+    val keywords: List<String>,
+    val pkg: String? = null,
+    val action: RuleAction = RuleAction.DISMISS,
+    val enabled: Boolean = true,
+)
+
+@Serializable
+enum class Outcome { SHOWN, BLOCKED, RULE }
+
+/** One notification as it arrived; kept for 7 days. */
+@Serializable
+data class HistoryEntry(
+    val time: Long,
+    val key: String,
+    val pkg: String,
+    val app: String,
+    val channelId: String,
+    val channelName: String,
+    val category: Category,
+    val title: String,
+    val text: String,
+    val outcome: Outcome,
+    /** Rule name for [Outcome.RULE]. */
+    val reason: String? = null,
+)
+
+@Serializable
+enum class ThemeMode(val label: String) { SYSTEM("System"), LIGHT("Light"), DARK("Dark") }
+
+@Serializable
+data class StoreData(
+    val overrides: Map<String, Category> = emptyMap(),
+    val policies: Map<Category, ChannelAction> = emptyMap(),
+    val known: Set<String> = emptySet(),
+    val hints: Map<String, Set<String>> = emptyMap(),
+    val history: List<Batch> = emptyList(),
+    val rules: List<Rule> = emptyList(),
+    /** Channel keys we block (and log). */
+    val logBlocked: Set<String> = emptySet(),
+    val logExcludedApps: Set<String> = emptySet(),
+    val theme: ThemeMode = ThemeMode.SYSTEM,
+    /** Wallpaper-based colours instead of the brand palette. */
+    val materialYou: Boolean = false,
+)

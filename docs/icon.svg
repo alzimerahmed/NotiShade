@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="18 18 72 72" width="160" height="160" role="img" aria-label="Sift">
+  <!-- Same geometry as app/src/main/res/drawable/ic_launcher_*.xml, cropped to the visible 72 of 108 units. -->
+  <defs>
+    <clipPath id="tile"><rect x="18" y="18" width="72" height="72" rx="20"/></clipPath>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="108" height="108" fill="#15161C"/>
+    <g fill="#FFFFFF">
+      <rect x="30" y="37" width="48" height="7" rx="3.5"/>
+      <rect x="38" y="50.5" width="32" height="7" rx="3.5"/>
+      <rect x="46" y="64" width="16" height="7" rx="3.5"/>
+    </g>
+  </g>
+</svg>

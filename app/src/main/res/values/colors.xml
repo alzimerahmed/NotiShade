@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brand_ink">#15161C</color>
+    <!-- Match the Compose theme's surface so launch has no flash of a different colour. -->
+    <color name="window_light">#FAFAF9</color>
+    <color name="window_dark">#0E0E10</color>
+</resources>
