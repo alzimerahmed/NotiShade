@@ -57,6 +57,7 @@ import app.sift.data.HistoryEntry
 import app.sift.data.Outcome
 import app.sift.data.Rule
 import app.sift.data.RuleAction
+import app.sift.data.Schedule
 
 private val ruleIdeas = listOf(
     "Sales & offers" to listOf("sale", "% off", "discount", "deal"),
@@ -77,6 +78,7 @@ private fun Rule.matches(e: HistoryEntry): Boolean {
 @Composable
 fun RulesScreen(
     rules: List<Rule>,
+    schedules: Map<String, Schedule>,
     apps: List<AppInfo>,
     history: List<HistoryEntry>,
     access: AccessState,
@@ -159,6 +161,8 @@ fun RulesScreen(
             isNew = isNew,
             apps = apps,
             history = history,
+            schedule = schedules[Schedule.keyFor(rule.id)],
+            onSaveSchedule = { vm.setSchedule(Schedule.keyFor(rule.id), it) },
             onDismiss = { editing = null },
             onSave = { vm.saveRule(it); editing = null },
             onDelete = if (isNew) null else ({ vm.deleteRule(rule); editing = null }),
@@ -250,6 +254,8 @@ fun RuleEditorSheet(
     isNew: Boolean,
     apps: List<AppInfo>,
     history: List<HistoryEntry>,
+    schedule: Schedule?,
+    onSaveSchedule: (Schedule?) -> Unit,
     onDismiss: () -> Unit,
     onSave: (Rule) -> Unit,
     onDelete: (() -> Unit)?,
@@ -338,6 +344,9 @@ fun RuleEditorSheet(
 
             if (allKeywords.isNotEmpty()) MatchPreview(matches)
 
+            FieldLabel("Quiet hours")
+            ScheduleEditor(schedule, onSaveSchedule)
+
             Row(Modifier.fillMaxWidth().padding(top = 20.dp), verticalAlignment = Alignment.CenterVertically) {
                 onDelete?.let { TextButton(onClick = it) { Text("Delete", color = MaterialTheme.colorScheme.error) } }
                 Spacer(Modifier.weight(1f))
@@ -376,7 +385,4 @@ private fun MatchPreview(matches: List<HistoryEntry>) {
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-            }
-        }
-    }
-}
+     

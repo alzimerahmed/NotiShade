@@ -8,7 +8,9 @@ import app.sift.data.ChannelAction
 import app.sift.data.ChannelChange
 import app.sift.data.ChannelInfo
 import app.sift.data.RawApp
+import app.sift.data.Schedule
 import app.sift.data.keyOf
+import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -56,6 +58,9 @@ class BulkEngine(private val app: App) {
             } else {
                 list.groupBy { it.category }.forEach { (cat, l) ->
                     val action = d.policies[cat] ?: return@forEach
+                    // Quiet hours: the category action only applies inside its window.
+                    val schedule = d.schedules[Schedule.keyFor(cat)]
+                    if (schedule != null && !schedule.activeAt(System.currentTimeMillis(), ZoneId.systemDefault())) return@forEach
                     apply("Auto ${action.label.lowercase()}: new ${cat.label} channels", l, action)
                 }
             }

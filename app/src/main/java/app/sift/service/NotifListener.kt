@@ -17,8 +17,12 @@ import app.sift.data.ChannelInfo
 import app.sift.data.Classifier
 import app.sift.data.HistoryEntry
 import app.sift.data.Outcome
+import app.sift.data.RuleMatcher
 import app.sift.data.RuleAction
+import app.sift.data.Schedule
+import app.sift.data.StoreData
 import app.sift.data.keyOf
+import java.time.ZoneId
 import kotlinx.coroutines.launch
 
 class NotifListener : NotificationListenerService() {
@@ -56,7 +60,12 @@ class NotifListener : NotificationListenerService() {
         app.repo.scanAll()
         val apps = app.repo.apps.value
         val d = app.store.data.value
+        val now = System.currentTimeMillis()
+        val zone = ZoneId.systemDefault()
         d.policies.forEach { (cat, action) ->
+            // Quiet hours: a category with a schedule is only re-enforced inside its window.
+            val schedule = d.schedules[Schedule.keyFor(cat)]
+            if (schedule != null && !schedule.activeAt(now, zone)) return@forEach
             val targets = apps.flatMap { a -> a.channels.filter { it.category == cat && !alreadyAllowed(it, action) } }
             if (targets.isNotEmpty()) {
                 app.engine.apply("Re-applied: ${action.verb.lowercase()} ${cat.label}", targets, action)
@@ -82,6 +91,8 @@ class NotifListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification, rankingMap: RankingMap?) {
         if (sbn.packageName == packageName) return
+        val now = System.currentTimeMillis()
+        val zone = ZoneId.systemDefault()
         val channel = channelOf(sbn, rankingMap)
         val channelId = sbn.notification.channelId ?: channel?.id
         // Android 16+ may move a notification into a system bundle channel; that's a free classification hint.
@@ -96,16 +107,27 @@ class NotifListener : NotificationListenerService() {
         val blockAndLog = channelId != null && keyOf(sbn.packageName, channelId) in d.logBlocked &&
             (bundled || channel?.importance == NotificationManager.IMPORTANCE_MIN)
         if (blockAndLog && clearable) {
-            // Group summaries are removed too, but only real notifications are logged.
-            cancelNotification(sbn.key)
-            if (worthLogging(sbn)) record(sbn, channel, Outcome.BLOCKED)
-            return
+            // Quiet hours: outside the window the block pauses and the notification shows as usual.
+            // Only classified when a schedule exists, so the hot path stays cheap otherwise.
+            val schedule = if (d.schedules.isEmpty()) {
+                null
+            } else {
+                d.schedules[Schedule.keyFor(categoryOf(sbn, channel, channelId, d))]
+            }
+            if (schedule == null || schedule.activeAt(now, zone)) {
+                // Group summaries are removed too, but only real notifications are logged.
+                cancelNotification(sbn.key)
+                if (worthLogging(sbn)) record(sbn, channel, Outcome.BLOCKED)
+                return
+            }
         }
         if (!worthLogging(sbn)) return
 
         val rule = if (clearable) {
             val extras = sbn.notification.extras
             RuleMatcher.match(d.rules, sbn.packageName, textKeys.map { extras.getCharSequence(it) })
+                // Quiet hours: a rule with a schedule only fires inside its window.
+                ?.takeIf { r -> d.schedules[Schedule.keyFor(r.id)]?.activeAt(now, zone) != false }
         } else {
             null
         }
@@ -152,13 +174,9 @@ class NotifListener : NotificationListenerService() {
         if (sbn.packageName in d.logExcludedApps) return
         val extras = sbn.notification.extras
         val channelId = sbn.notification.channelId ?: channel?.id.orEmpty()
-        val key = keyOf(sbn.packageName, channelId)
         val known = app.repo.apps.value.firstOrNull { it.pkg == sbn.packageName }
         val knownChannel = known?.channels?.firstOrNull { it.channel.id == channelId }
-        val category = d.overrides[key]
-            ?: knownChannel?.category
-            ?: channel?.let { Classifier.classify(it, null, d.hints[key].orEmpty()).first }
-            ?: Category.OTHER
+        val category = categoryOf(sbn, channel, channelId, d)
         app.history.record(
             HistoryEntry(
                 time = time,
@@ -176,6 +194,17 @@ class NotifListener : NotificationListenerService() {
             ),
             inPlace = sbn.isOngoing,
         )
+    }
+
+    /** Overrides first, then the scanned classification, then the classifier fallback. */
+    private fun categoryOf(sbn: StatusBarNotification, channel: NotificationChannel?, channelId: String, d: StoreData): Category {
+        val key = keyOf(sbn.packageName, channelId)
+        val knownChannel = app.repo.apps.value.firstOrNull { it.pkg == sbn.packageName }
+            ?.channels?.firstOrNull { it.channel.id == channelId }
+        return d.overrides[key]
+            ?: knownChannel?.category
+            ?: channel?.let { Classifier.classify(it, null, d.hints[key].orEmpty()).first }
+            ?: Category.OTHER
     }
 
     private fun appLabel(pkg: String) = runCatching {

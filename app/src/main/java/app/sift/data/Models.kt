@@ -146,6 +146,8 @@ data class StoreData(
     val logExcludedApps: Set<String> = emptySet(),
     /** Default action for every channel of an app, including ones it creates later. */
     val appDefaults: Map<String, ChannelAction> = emptyMap(),
+    /** Quiet-hours windows, keyed by [Schedule.keyFor] — at most one per category or rule. */
+    val schedules: Map<String, Schedule> = emptyMap(),
     val theme: ThemeMode = ThemeMode.SYSTEM,
     /** Wallpaper-based colours instead of the brand palette. */
     val materialYou: Boolean = false,

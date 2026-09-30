@@ -13,6 +13,7 @@ import app.sift.data.ChannelAction
 import app.sift.data.ChannelInfo
 import app.sift.data.HistoryEntry
 import app.sift.data.Rule
+import app.sift.data.Schedule
 import app.sift.data.ThemeMode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,6 +85,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setPolicy(cat: Category, action: ChannelAction?) = app.store.update {
         it.copy(policies = if (action == null) it.policies - cat else it.policies + (cat to action))
+    }
+
+    /** Quiet hours for a category or rule; null clears the schedule. */
+    fun setSchedule(key: String, schedule: Schedule?) = app.store.update {
+        it.copy(schedules = if (schedule == null) it.schedules - key else it.schedules + (key to schedule))
     }
 
     fun setOverride(c: ChannelInfo, cat: Category?) = app.store.update {

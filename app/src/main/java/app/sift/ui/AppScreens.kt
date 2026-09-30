@@ -183,7 +183,7 @@ fun AppDetailScreen(app: AppInfo?, appDefault: ChannelAction?, nav: Nav, vm: Mai
                         headlineContent = { Text("New channels") },
                         supportingContent = { Text("Apply the same action to every channel of this app, now and later") },
                         trailingContent = {
-                            PickerButton(policyLabel(appDefault), policyOptions, ::policyLabel) {
+                            PickerButton(appDefaultLabel(appDefault), appDefaultOptions, ::appDefaultLabel) {
                                 vm.setAppDefault(app.pkg, app.label, it, app.channels)
                             }
                         },
@@ -269,10 +269,18 @@ private fun ChannelSheet(
     }
 }
 
+private val appDefaultOptions = listOf<ChannelAction?>(null, ChannelAction.ALERT, ChannelAction.SILENT, ChannelAction.BLOCK)
+
+private fun appDefaultLabel(a: ChannelAction?) = when (a) {
+    null -> "No default"
+    ChannelAction.ALERT -> "Allow"
+    ChannelAction.SILENT -> "Silence"
+    else -> "Block"
+}
+
 /** Low-emphasis bulk action; only the destructive one takes colour. */
 @Composable
-private fun BulkButton(label: String, danger: Boolean = false, onClick: () -> Unit) {
-    OutlinedButton(
+private fun BulkButton(label: String, danger: Boolean = false, onClick: () -> Unit) {    OutlinedButton(
         onClick = onClick,
         shape = CircleShape,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),

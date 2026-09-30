@@ -63,6 +63,7 @@ import app.sift.data.ChannelAction
 import app.sift.data.ChannelInfo
 import app.sift.data.HistoryEntry
 import app.sift.data.Outcome
+import app.sift.data.Schedule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
@@ -304,9 +305,9 @@ private fun CategoryRow(
     )
 }
 
-private val policyOptions = listOf(null, ChannelAction.ALERT, ChannelAction.SILENT, ChannelAction.BLOCK)
+val policyOptions = listOf(null, ChannelAction.ALERT, ChannelAction.SILENT, ChannelAction.BLOCK)
 
-private fun policyLabel(a: ChannelAction?) = when (a) {
+fun policyLabel(a: ChannelAction?) = when (a) {
     null -> "Leave as is"
     ChannelAction.ALERT -> "Allow"
     ChannelAction.SILENT -> "Silence"
@@ -318,6 +319,7 @@ fun CategoryScreen(
     cat: Category,
     apps: List<AppInfo>,
     policy: ChannelAction?,
+    schedule: Schedule?,
     nav: Nav,
     vm: MainViewModel,
 ) {
@@ -326,6 +328,7 @@ fun CategoryScreen(
     var filter by rememberSaveable { mutableStateOf<Status?>(null) }
     var selected by remember { mutableStateOf(emptySet<String>()) }
     var expanded by remember { mutableStateOf(emptySet<String>()) }
+    var editingSchedule by remember { mutableStateOf(false) }
 
     val visible = channels.filter { filter == null || it.status() == filter }.groupBy { it.pkg }
     val visibleKeys = visible.values.flatten().map { it.key }.toSet()
@@ -382,6 +385,18 @@ fun CategoryScreen(
                         trailingContent = { PickerButton(policyLabel(policy), policyOptions, ::policyLabel) { vm.setPolicy(cat, it) } },
                         colors = clearListItem(),
                     )
+                    ListItem(
+                        headlineContent = { Text("Quiet hours") },
+                        supportingContent = {
+                            Text(
+                                if (schedule == null) "Apply the block only at certain times"
+                                else "Blocking pauses outside ${scheduleSummary(schedule)}",
+                            )
+                        },
+                        trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
+                        colors = clearListItem(),
+                        modifier = Modifier.clickable { editingSchedule = true },
+                    )
                 }
             }
             item {
@@ -434,6 +449,18 @@ fun CategoryScreen(
                 }
             }
         }
+    }
+    if (editingSchedule) {
+        ScheduleEditorSheet(
+            "${cat.label} quiet hours",
+            schedule,
+            onDismiss = { editingSchedule = false },
+            onSave = { s ->
+                vm.setSchedule(Schedule.keyFor(cat), s)
+                editingSchedule = false
+                vm.say(if (s == null) "Quiet hours off for ${cat.label}" else "Quiet hours for ${cat.label} · ${scheduleSummary(s)}")
+            },
+        )
     }
 }
 
