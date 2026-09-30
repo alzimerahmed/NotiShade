@@ -31,7 +31,7 @@ Sift = on-device Android notification category manager (repo: https://github.com
 - **State down / events up**: `MainViewModel` exposes StateFlows; screens call VM methods; user feedback through `vm.say(...)` snackbars (single SnackbarHost in `AppRoot`, undo window 6s).
 - **All channel mutations go through `BulkEngine`** — it verifies changes actually applied (system silently ignores some), records undoable `Batch`es, and syncs `logBlocked`. Never call `Channels.update` from UI or the listener directly.
 - **The listener is the hot path** — keep `NotifListener.onNotificationPosted` cheap; persist via batched stores; wrap engine calls in `runCatching`.
-- **User-facing strings are hardcoded English** in composables (no `strings.xml` usage in UI) — follow the existing style; don't introduce a resource layer unilaterally.
+- **User-facing strings live in `strings.xml`** (extracted in Phase 6) — composables use `stringResource(R.string.x)`, non-composable paths use `Context.getString`/`getQuantityString`; es/de/ar locales exist (ar = RTL test). Persisted data keys (e.g. `Category.label`, batch titles) stay English by design — see `docs/research.md` ADR-007.
 
 ### Build Inputs (secrets — never commit)
 - Release signing via CI secrets: `SIFT_KEYSTORE_BASE64`, `SIFT_KEYSTORE_PASSWORD`, `SIFT_KEY_ALIAS`, `SIFT_KEY_PASSWORD` (see `.github/workflows/release.yml`). Never commit keystore material (`.gitignore` covers `*.jks`, `*.keystore`, `keystore.properties`).

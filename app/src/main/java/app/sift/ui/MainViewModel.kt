@@ -20,7 +20,9 @@ import app.sift.data.Rule
 import app.sift.data.Schedule
 import app.sift.data.ThemeMode
 import app.sift.service.PauseTileService
+import app.sift.widget.BlockedWidgetProvider
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -141,7 +143,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteEntry(e: HistoryEntry) = app.history.remove(e)
 
-    fun clearHistory() = app.history.clear()
+    fun clearHistory() {
+        app.history.clear()
+        app.scope.launch(Dispatchers.Default) { runCatching { BlockedWidgetProvider.refresh(app) } }
+    }
 
     fun setLogExcluded(pkg: String, excluded: Boolean) {
         app.store.update { data ->

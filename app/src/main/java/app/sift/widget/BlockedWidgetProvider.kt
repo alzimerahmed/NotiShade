@@ -44,7 +44,7 @@ class BlockedWidgetProvider : AppWidgetProvider() {
             } else {
                 rv.setViewVisibility(R.id.widget_list, android.view.View.VISIBLE)
                 rv.setViewVisibility(R.id.widget_empty, android.view.View.GONE)
-                blocked.take(5).forEach { e ->
+                blocked.take(MAX_ROWS).forEach { e ->
                     val row = RemoteViews(context.packageName, R.layout.widget_blocked_row)
                     row.setTextViewText(R.id.row_title, e.title.ifBlank { e.text.ifBlank { e.app } })
                     row.setTextViewText(
