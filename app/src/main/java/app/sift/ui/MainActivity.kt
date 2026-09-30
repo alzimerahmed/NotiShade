@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
@@ -114,6 +116,13 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
     }
     val nav = remember(stack) { Nav(stack) }
 
+    val exportSettings = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        uri?.let(vm::exportTo)
+    }
+    val importSettings = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(vm::importFrom)
+    }
+
     LaunchedEffect(Unit) {
         var showing: Job? = null
         vm.message.filterNotNull().collect { m ->
@@ -156,7 +165,11 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
                 Tab.APPS -> AppsScreen(apps, history, progress, onTab = { tab = it }) { nav.push("app/$it") }
                 Tab.LOGS -> LogsScreen(history, apps, access, onTab = { tab = it }, nav, vm)
                 Tab.RULES -> RulesScreen(store.rules, apps, history, access, onTab = { tab = it }, nav, vm)
-                Tab.SETTINGS -> SettingsScreen(access, store, apps, onTab = { tab = it }, nav, vm)
+                Tab.SETTINGS -> SettingsScreen(
+                    access, store, apps, onTab = { tab = it }, nav, vm,
+                    onExport = { exportSettings.launch("sift-settings.json") },
+                    onImport = { importSettings.launch(arrayOf("application/json", "application/octet-stream", "text/plain")) },
+                )
             }
             route.startsWith("category/") -> {
                 val cat = Category.valueOf(route.removePrefix("category/"))

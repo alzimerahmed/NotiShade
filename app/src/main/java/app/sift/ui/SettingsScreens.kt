@@ -8,7 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +22,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.sift.BuildConfig
@@ -36,8 +40,11 @@ fun SettingsScreen(
     onTab: (Tab) -> Unit,
     nav: Nav,
     vm: MainViewModel,
+    onExport: () -> Unit,
+    onImport: () -> Unit,
 ) {
     val historyCount = store.history.size
+    var confirmImport by remember { mutableStateOf(false) }
     TabScaffold(Tab.SETTINGS, onTab) {
         LazyColumn {
             item { SectionLabel("Access") }
@@ -91,6 +98,26 @@ fun SettingsScreen(
                 )
             }
 
+            item { SectionLabel("Backup") }
+            item {
+                ListItem(
+                    headlineContent = { Text("Export settings") },
+                    supportingContent = { Text("Save categories, rules and exclusions to a file") },
+                    trailingContent = { Icon(Icons.Default.SaveAlt, null) },
+                    colors = clearListItem(),
+                    modifier = Modifier.clickable(onClick = onExport),
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text("Import settings") },
+                    supportingContent = { Text("Restore from a backup file") },
+                    trailingContent = { Icon(Icons.Default.FolderOpen, null) },
+                    colors = clearListItem(),
+                    modifier = Modifier.clickable { confirmImport = true },
+                )
+            }
+
             item { SectionLabel("Appearance") }
             item {
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
@@ -123,6 +150,16 @@ fun SettingsScreen(
                 )
             }
         }
+    }
+
+    if (confirmImport) {
+        AlertDialog(
+            onDismissRequest = { confirmImport = false },
+            title = { Text("Import settings?") },
+            text = { Text("Replaces your current categories, rules, exclusions and appearance with the ones in the backup file.") },
+            confirmButton = { TextButton(onClick = { confirmImport = false; onImport() }) { Text("Import") } },
+            dismissButton = { TextButton(onClick = { confirmImport = false }) { Text("Cancel") } },
+        )
     }
 }
 

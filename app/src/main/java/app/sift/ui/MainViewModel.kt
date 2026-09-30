@@ -1,9 +1,11 @@
 package app.sift.ui
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import app.sift.App
+import app.sift.data.BackupCodec
 import app.sift.data.Batch
 import app.sift.data.Category
 import app.sift.data.ChannelAction
@@ -123,4 +125,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun setTheme(mode: ThemeMode) = app.store.update { it.copy(theme = mode) }
 
     fun setMaterialYou(on: Boolean) = app.store.update { it.copy(materialYou = on) }
+
+    fun exportTo(uri: Uri) = launch {
+        val out = getApplication<App>().contentResolver.openOutputStream(uri) ?: error("Couldn't open the file")
+        out.use { it.write(BackupCodec.encode(app.store.data.value).encodeToByteArray()) }
+        say("Settings exported")
+    }
+
+    fun importFrom(uri: Uri) = launch {
+        val text = getApplication<App>().contentResolver.openInputStream(uri)?.use {
+            val bytes = it.readNBytes(MAX_BACKUP_BYTES + 1)
+            if (bytes.size > MAX_BACKUP_BYTES) error("File is too large")
+            bytes.decodeToString()
+        } ?: error("Couldn't read the file")
+        val imported = BackupCodec.decode(text) ?: error("Not a Sift settings file")
+        app.store.update { imported }
+        // Settings alone aren't enough: re-apply the imported policies to the actual channels.
+        say("Applying imported settings…")
+        app.repo.scanAll()
+        val apps = app.repo.apps.value
+        imported.policies.forEach { (cat, action) ->
+            val targets = apps.flatMap { a -> a.channels.filter { it.category == cat } }
+            if (targets.isNotEmpty()) app.engine.apply("Restored: ${action.verb.lowercase()} ${cat.label}", targets, action)
+        }
+        val blocked = apps.flatMap { a -> a.channels.filter { it.key in imported.logBlocked } }
+        if (blocked.isNotEmpty()) app.engine.apply("Restored blocked channels", blocked, ChannelAction.BLOCK)
+        say("Settings imported")
+    }
+
+    private companion object {
+        const val MAX_BACKUP_BYTES = 2_000_000
+    }
 }

@@ -71,6 +71,11 @@ private enum class ShowFilter(val label: String) { ALL("All"), SHOWN("Shown"), B
 
 private val HistoryEntry.blocked get() = outcome != Outcome.SHOWN
 
+/** Case-insensitive substring match over the fields a user sees on a log row. */
+private fun matchQuery(e: HistoryEntry, q: String) =
+    e.title.contains(q, ignoreCase = true) || e.text.contains(q, ignoreCase = true) ||
+        e.app.contains(q, ignoreCase = true) || e.channelName.contains(q, ignoreCase = true)
+
 private fun HistoryEntry.blockLabel() = when (outcome) {
     Outcome.RULE -> "Removed by rule \u201c$reason\u201d"
     else -> "Blocked" + channelName.ifBlank { null }?.let { " \u00b7 $it" }.orEmpty()
@@ -88,14 +93,17 @@ fun LogsScreen(
     var show by rememberSaveable { mutableStateOf(ShowFilter.ALL) }
     var pkg by rememberSaveable { mutableStateOf<String?>(null) }
     var category by rememberSaveable { mutableStateOf<Category?>(null) }
+    var query by rememberSaveable { mutableStateOf("") }
     var open by remember { mutableStateOf<HistoryEntry?>(null) }
     var ruleDraft by remember { mutableStateOf<Rule?>(null) }
     var confirmClear by remember { mutableStateOf(false) }
 
-    val filtered = remember(entries, show, pkg, category) {
+    val filtered = remember(entries, show, pkg, category, query) {
+        val q = query.trim()
         entries.filter {
             (show == ShowFilter.ALL || (show == ShowFilter.BLOCKED) == it.blocked) &&
-                (pkg == null || it.pkg == pkg) && (category == null || it.category == category)
+                (pkg == null || it.pkg == pkg) && (category == null || it.category == category) &&
+                (q.isEmpty() || matchQuery(it, q))
         }
     }
 
@@ -118,8 +126,14 @@ fun LogsScreen(
                 return@Column
             }
             Filters(entries, show, { show = it }, pkg, { pkg = it }, category, { category = it })
+            SearchField(
+                query,
+                { query = it },
+                placeholder = "Search title, text or app",
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+            )
             if (filtered.isEmpty()) {
-                EmptyState("No matches", "Try different filters.")
+                EmptyState("No matches", "Try different filters or a different search.")
                 return@Column
             }
             HistoryList(filtered) { open = it }
