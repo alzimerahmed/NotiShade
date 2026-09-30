@@ -144,6 +144,8 @@ data class StoreData(
     /** Channel keys we block (and log). */
     val logBlocked: Set<String> = emptySet(),
     val logExcludedApps: Set<String> = emptySet(),
+    /** Default action for every channel of an app, including ones it creates later. */
+    val appDefaults: Map<String, ChannelAction> = emptyMap(),
     val theme: ThemeMode = ThemeMode.SYSTEM,
     /** Wallpaper-based colours instead of the brand palette. */
     val materialYou: Boolean = false,

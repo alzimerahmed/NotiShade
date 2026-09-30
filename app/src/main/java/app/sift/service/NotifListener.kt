@@ -6,10 +6,14 @@ import android.app.NotificationManager
 import android.content.pm.PackageManager
 import android.os.Process
 import android.os.UserHandle
+import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import app.sift.App
+import app.sift.data.BootMarker
 import app.sift.data.Category
+import app.sift.data.ChannelAction
+import app.sift.data.ChannelInfo
 import app.sift.data.Classifier
 import app.sift.data.HistoryEntry
 import app.sift.data.Outcome
@@ -38,7 +42,38 @@ class NotifListener : NotificationListenerService() {
         runCatching { activeNotifications }.getOrNull()?.sortedBy { it.postTime }?.forEach { sbn ->
             if (worthLogging(sbn)) record(sbn, channelOf(sbn, ranking), Outcome.SHOWN, time = sbn.postTime)
         }
+        // Boot resilience: the system restores channel importance itself, but only for channels
+        // it knows about; re-apply our policies in the background, throttled. The hot path
+        // (onNotificationPosted) is untouched.
+        app.scope.launch { runCatching { reenforcePolicies() } }
     }
+
+    /** Re-applies stored policies (category actions, app defaults; overrides via classification). */
+    private suspend fun reenforcePolicies() {
+        val boot = Settings.Global.getInt(contentResolver, Settings.Global.BOOT_COUNT, -1)
+        val last = BootMarker.load(applicationContext)
+        if (!BootMarker.shouldRun(last, boot, System.currentTimeMillis())) return
+        app.repo.scanAll()
+        val apps = app.repo.apps.value
+        val d = app.store.data.value
+        d.policies.forEach { (cat, action) ->
+            val targets = apps.flatMap { a -> a.channels.filter { it.category == cat && !alreadyAllowed(it, action) } }
+            if (targets.isNotEmpty()) {
+                app.engine.apply("Re-applied: ${action.verb.lowercase()} ${cat.label}", targets, action)
+            }
+        }
+        d.appDefaults.forEach { (pkg, action) ->
+            val targets = apps.firstOrNull { it.pkg == pkg }?.channels.orEmpty().filter { !alreadyAllowed(it, action) }
+            if (targets.isNotEmpty()) {
+                app.engine.apply("Re-applied: ${action.verb.lowercase()} ${targets.firstOrNull()?.appLabel ?: pkg}", targets, action)
+            }
+        }
+        BootMarker.save(applicationContext, boot, System.currentTimeMillis())
+    }
+
+    /** "Allow" must not downgrade channels the user set to pop up; the rest are enforced as-is. */
+    private fun alreadyAllowed(c: ChannelInfo, action: ChannelAction) =
+        action == ChannelAction.ALERT && c.channel.importance >= NotificationManager.IMPORTANCE_DEFAULT
 
     override fun onListenerDisconnected() {
         instance = null

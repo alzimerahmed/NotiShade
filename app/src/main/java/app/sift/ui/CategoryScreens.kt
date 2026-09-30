@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import app.sift.backend.AccessState
 import app.sift.data.AppInfo
 import app.sift.data.Category
+import app.sift.data.CategoryStats
 import app.sift.data.ChannelAction
 import app.sift.data.ChannelInfo
 import app.sift.data.HistoryEntry
@@ -129,6 +130,7 @@ private fun rememberCategorySwitches(blocked: (Category) -> Boolean): CategorySw
 fun HomeScreen(
     apps: List<AppInfo>,
     history: List<HistoryEntry>,
+    stats: Map<Category, CategoryStats.Counts>,
     policies: Map<Category, ChannelAction>,
     access: AccessState,
     progress: Pair<Int, Int>?,
@@ -170,7 +172,7 @@ fun HomeScreen(
                             present.forEach { cat ->
                                 val channels = byCategory.getValue(cat)
                                 CategoryRow(
-                                    cat, channels, policies[cat],
+                                    cat, channels, policies[cat], stats[cat],
                                     on = switches.isOn(cat),
                                     // Deliberately not disabled while applying: `enabled = false`
                                     // swaps in the disabled track colour, which flashes. Repeat
@@ -272,6 +274,7 @@ private fun CategoryRow(
     cat: Category,
     channels: List<ChannelInfo>,
     policy: ChannelAction?,
+    stats: CategoryStats.Counts?,
     on: Boolean,
     enabled: Boolean,
     onToggle: (Boolean) -> Unit,
@@ -279,14 +282,16 @@ private fun CategoryRow(
 ) {
     val appCount = channels.distinctBy { it.pkg }.size
     val apps = "$appCount ${if (appCount == 1) "app" else "apps"}"
+    // This week's counts, from Logs: "12 shown · 3 blocked". Omitted when there's no history yet.
+    val counts = stats?.let { " · ${it.shown} shown · ${it.blocked} blocked" }.orEmpty()
     ListItem(
         headlineContent = { Text(cat.label) },
         supportingContent = {
             Text(
                 if (channels.allBlocked()) {
-                    "Off · $apps"
+                    "Off · $apps$counts"
                 } else {
-                    "$apps · ${statusSummary(channels)}" + policy?.let { " · new: ${policyLabel(it).lowercase()}" }.orEmpty()
+                    "$apps · ${statusSummary(channels)}$counts" + policy?.let { " · new: ${policyLabel(it).lowercase()}" }.orEmpty()
                 },
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

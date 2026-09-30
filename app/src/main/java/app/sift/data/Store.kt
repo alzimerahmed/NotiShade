@@ -10,12 +10,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.json.Json
 import java.io.File
 
 class Store(context: Context, private val scope: CoroutineScope) {
     private val file = AtomicFile(File(context.filesDir, "store.json"))
-    private val json = Json { ignoreUnknownKeys = true }
     private val writeLock = Mutex()
     private val _data = MutableStateFlow(load())
     val data: StateFlow<StoreData> = _data
@@ -34,15 +32,13 @@ class Store(context: Context, private val scope: CoroutineScope) {
     fun addBatch(batch: Batch) = update { it.copy(history = (listOf(batch) + it.history).take(50)) }
 
     private fun load(): StoreData = runCatching {
-        // "Block & log" was merged into "Block".
-        val text = file.readFully().decodeToString().replace("\"BLOCK_LOG\"", "\"BLOCK\"")
-        json.decodeFromString<StoreData>(text)
+        StoreMigrations.decode(file.readFully().decodeToString())
     }.getOrDefault(StoreData())
 
     private fun save(d: StoreData) {
         val out = file.startWrite()
         try {
-            out.write(json.encodeToString(d).encodeToByteArray())
+            out.write(StoreMigrations.json.encodeToString(StoreData.serializer(), d).encodeToByteArray())
             file.finishWrite(out)
         } catch (e: Exception) {
             file.failWrite(out)

@@ -138,7 +138,7 @@ private fun appSummary(a: AppInfo): String = when {
 }
 
 @Composable
-fun AppDetailScreen(app: AppInfo?, nav: Nav, vm: MainViewModel) {
+fun AppDetailScreen(app: AppInfo?, appDefault: ChannelAction?, nav: Nav, vm: MainViewModel) {
     var sheetKey by rememberSaveable { mutableStateOf<String?>(null) }
 
     DetailScaffold(app?.label ?: "App", nav::back) {
@@ -177,6 +177,18 @@ fun AppDetailScreen(app: AppInfo?, nav: Nav, vm: MainViewModel) {
                         BulkButton("Silence all") { vm.bulk(app.channels, ChannelAction.SILENT, app.label) }
                         BulkButton("Block all", danger = true) { vm.bulk(app.channels, ChannelAction.BLOCK, app.label) }
                     }
+                }
+                item {
+                    ListItem(
+                        headlineContent = { Text("New channels") },
+                        supportingContent = { Text("Apply the same action to every channel of this app, now and later") },
+                        trailingContent = {
+                            PickerButton(policyLabel(appDefault), policyOptions, ::policyLabel) {
+                                vm.setAppDefault(app.pkg, app.label, it, app.channels)
+                            }
+                        },
+                        colors = clearListItem(),
+                    )
                 }
             }
             app.error?.let { item { Text("Couldn't read channels: $it", Modifier.padding(16.dp), color = MaterialTheme.colorScheme.error) } }

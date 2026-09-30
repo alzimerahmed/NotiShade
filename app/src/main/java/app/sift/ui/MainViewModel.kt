@@ -8,6 +8,7 @@ import app.sift.App
 import app.sift.data.BackupCodec
 import app.sift.data.Batch
 import app.sift.data.Category
+import app.sift.data.CategoryStats
 import app.sift.data.ChannelAction
 import app.sift.data.ChannelInfo
 import app.sift.data.HistoryEntry
@@ -15,6 +16,7 @@ import app.sift.data.Rule
 import app.sift.data.ThemeMode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 data class UiMessage(val text: String, val undo: Batch? = null, val onUndo: (() -> Unit)? = null)
@@ -88,9 +90,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         it.copy(overrides = if (cat == null) it.overrides - c.key else it.overrides + (c.key to cat))
     }
 
+    /**
+     * Per-app default: fans one action out to every channel of the app as ONE undoable batch
+     * (locked channels reported by the outcome), and stores it so channels the app adds later
+     * get the same action on arrival. Clearing it only affects future channels.
+     */
+    fun setAppDefault(pkg: String, label: String, action: ChannelAction?, channels: List<ChannelInfo>) = launch {
+        app.store.update {
+            it.copy(appDefaults = if (action == null) it.appDefaults - pkg else it.appDefaults + (pkg to action))
+        }
+        if (action == null) return@launch say("New channels of $label will keep their own settings")
+        val targets = if (action == ChannelAction.ALERT) channels.filter { it.status() != Status.ALLOWED } else channels
+        if (targets.isEmpty()) return@launch say("New channels of $label will be ${action.label.lowercase()}")
+        val outcome = app.engine.apply("${action.verb}: $label · all channels", targets, action)
+        message.value = UiMessage("All channels · ${outcome.describe(action.verb)}", outcome.batch)
+    }
+
     fun undo(batch: Batch) = launch { say("Undone · " + app.engine.undo(batch).describe("Restored")) }
 
     val history = app.history.entries
+
+    /** Per-category shown/blocked counts, derived from history entries. */
+    private val _categoryStats = MutableStateFlow(emptyMap<Category, CategoryStats.Counts>())
+    val categoryStats: StateFlow<Map<Category, CategoryStats.Counts>> = _categoryStats
+
+    init {
+        viewModelScope.launch { app.history.entries.collect { _categoryStats.value = CategoryStats.perCategory(it) } }
+    }
 
     fun channelFor(e: HistoryEntry) = apps.value.firstOrNull { it.pkg == e.pkg }?.channels?.firstOrNull { it.channel.id == e.channelId }
 

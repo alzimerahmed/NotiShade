@@ -107,6 +107,7 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
     val store by vm.store.collectAsStateWithLifecycle()
     val progress by vm.progress.collectAsStateWithLifecycle()
     val history by vm.history.collectAsStateWithLifecycle()
+    val categoryStats by vm.categoryStats.collectAsStateWithLifecycle()
 
     val snackbar = remember { SnackbarHostState() }
     var tab by rememberSaveable { mutableStateOf(Tab.CATEGORIES) }
@@ -159,7 +160,7 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
         when {
             setup -> SetupScreen(access, vm, onBack = null, onContinue = { inSetup = false })
             route == null -> when (tab) {
-                Tab.CATEGORIES -> HomeScreen(apps, history, store.policies, access, progress, onTab = { tab = it }, vm) {
+                Tab.CATEGORIES -> HomeScreen(apps, history, categoryStats, store.policies, access, progress, onTab = { tab = it }, vm) {
                     nav.push("category/${it.name}")
                 }
                 Tab.APPS -> AppsScreen(apps, history, progress, onTab = { tab = it }) { nav.push("app/$it") }
@@ -176,7 +177,8 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
                 CategoryScreen(cat, apps, store.policies[cat], nav, vm)
             }
             route.startsWith("app/") -> {
-                AppDetailScreen(apps.firstOrNull { it.pkg == route.removePrefix("app/") }, nav, vm)
+                val pkg = route.removePrefix("app/")
+                AppDetailScreen(apps.firstOrNull { it.pkg == pkg }, store.appDefaults[pkg], nav, vm)
             }
             route == "history" -> HistoryScreen(store.history, nav, vm)
             route == "log-exclusions" -> LogExclusionsScreen(apps, store.logExcludedApps, nav, vm)

@@ -40,15 +40,25 @@ class BulkEngine(private val app: App) {
         return outcome
     }
 
-    /** Applies category policies to channels never seen before, then marks them as known. */
+    /**
+     * Applies policies to channels never seen before, then marks them as known. An app default
+     * (per-app control) takes precedence over the category policy for that app's new channels.
+     */
     suspend fun enforceNew(raws: Collection<RawApp>) {
         val d = app.store.data.value
         val fresh = raws.flatMap { app.repo.toInfo(it, d).channels }.filter { it.key !in d.known }
         if (fresh.isEmpty()) return
         app.store.update { it.copy(known = it.known + fresh.map { c -> c.key }) }
-        fresh.groupBy { it.category }.forEach { (cat, list) ->
-            val action = d.policies[cat] ?: return@forEach
-            apply("Auto ${action.label.lowercase()}: new ${cat.label} channels", list, action)
+        fresh.groupBy { it.pkg }.forEach { (pkg, list) ->
+            val appDefault = d.appDefaults[pkg]
+            if (appDefault != null) {
+                apply("Auto ${appDefault.label.lowercase()}: new ${list.first().appLabel} channels", list, appDefault)
+            } else {
+                list.groupBy { it.category }.forEach { (cat, l) ->
+                    val action = d.policies[cat] ?: return@forEach
+                    apply("Auto ${action.label.lowercase()}: new ${cat.label} channels", l, action)
+                }
+            }
         }
     }
 
