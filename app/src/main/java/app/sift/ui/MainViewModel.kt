@@ -18,6 +18,7 @@ import app.sift.data.HistoryEntry
 import app.sift.data.Rule
 import app.sift.data.Schedule
 import app.sift.data.ThemeMode
+import app.sift.service.PauseTileService
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
