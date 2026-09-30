@@ -385,4 +385,7 @@ private fun MatchPreview(matches: List<HistoryEntry>) {
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-     
+            }
+        }
+    }
+}

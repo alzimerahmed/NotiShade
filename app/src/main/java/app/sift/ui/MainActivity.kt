@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.sift.App
 import app.sift.data.Category
+import app.sift.data.Schedule
 import app.sift.data.ThemeMode
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -165,7 +166,7 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
                 }
                 Tab.APPS -> AppsScreen(apps, history, progress, onTab = { tab = it }) { nav.push("app/$it") }
                 Tab.LOGS -> LogsScreen(history, apps, access, onTab = { tab = it }, nav, vm)
-                Tab.RULES -> RulesScreen(store.rules, apps, history, access, onTab = { tab = it }, nav, vm)
+                Tab.RULES -> RulesScreen(store.rules, store.schedules, apps, history, access, onTab = { tab = it }, nav, vm)
                 Tab.SETTINGS -> SettingsScreen(
                     access, store, apps, onTab = { tab = it }, nav, vm,
                     onExport = { exportSettings.launch("sift-settings.json") },
@@ -174,7 +175,7 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
             }
             route.startsWith("category/") -> {
                 val cat = Category.valueOf(route.removePrefix("category/"))
-                CategoryScreen(cat, apps, store.policies[cat], nav, vm)
+                CategoryScreen(cat, apps, store.policies[cat], store.schedules[Schedule.keyFor(cat)], nav, vm)
             }
             route.startsWith("app/") -> {
                 val pkg = route.removePrefix("app/")

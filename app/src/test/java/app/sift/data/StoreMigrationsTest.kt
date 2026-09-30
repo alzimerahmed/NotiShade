@@ -23,4 +23,13 @@ class StoreMigrationsTest {
     @Test fun unknownKeysAreIgnored() {
         assertEquals(ThemeMode.DARK, StoreMigrations.decode("""{"futureField":1,"theme":"DARK"}""").theme)
     }
+
+    @Test fun missingSchedulesFallBackToEmpty() {
+        assertEquals(emptyMap<String, Schedule>(), StoreMigrations.decode("{}").schedules)
+    }
+
+    @Test fun schedulesRoundTrip() {
+        val d = StoreData(schedules = mapOf("cat:PROMO" to Schedule(22 * 60, 7 * 60, days = setOf(1, 2))))
+        assertEquals(d, StoreMigrations.decode(StoreMigrations.json.encodeToString(StoreData.serializer(), d)))
+    }
 }

@@ -294,7 +294,8 @@ fun ScheduleEditorSheet(
             Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = onDismiss) { Text("Cancel") }
                 Spacer(Modifier.weight(1f))
-                Button(enabled = draft != null, onClick = { onSave(draft) }) { Text("Save") }
+                // Always enabled: saving a null draft is how a schedule gets cleared.
+                Button(onClick = { onSave(draft) }) { Text("Save") }
             }
         }
     }

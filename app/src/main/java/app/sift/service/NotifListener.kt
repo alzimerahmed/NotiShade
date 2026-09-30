@@ -106,7 +106,7 @@ class NotifListener : NotificationListenerService() {
         val clearable = !sbn.isOngoing && sbn.isClearable
         val blockAndLog = channelId != null && keyOf(sbn.packageName, channelId) in d.logBlocked &&
             (bundled || channel?.importance == NotificationManager.IMPORTANCE_MIN)
-        if (blockAndLog && clearable) {
+        if (blockAndLog && clearable && channelId != null) {
             // Quiet hours: outside the window the block pauses and the notification shows as usual.
             // Only classified when a schedule exists, so the hot path stays cheap otherwise.
             val schedule = if (d.schedules.isEmpty()) {

@@ -50,6 +50,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -66,6 +67,7 @@ import app.sift.data.ChannelInfo
 import app.sift.data.HistoryEntry
 import app.sift.data.Outcome
 import app.sift.data.Rule
+import app.sift.data.Schedule
 
 private enum class ShowFilter(val label: String) { ALL("All"), SHOWN("Shown"), BLOCKED("Blocked") }
 
@@ -154,11 +156,14 @@ fun LogsScreen(
         )
     }
     ruleDraft?.let { rule ->
+        val store by vm.store.collectAsStateWithLifecycle()
         RuleEditorSheet(
             rule,
             isNew = true,
             apps = apps,
             history = entries,
+            schedule = store.schedules[Schedule.keyFor(rule.id)],
+            onSaveSchedule = { vm.setSchedule(Schedule.keyFor(rule.id), it) },
             onDismiss = { ruleDraft = null },
             onSave = { vm.saveRule(it); vm.say("Rule \u201c${it.name}\u201d created"); ruleDraft = null },
             onDelete = null,
