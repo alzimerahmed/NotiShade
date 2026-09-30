@@ -3,6 +3,7 @@ package app.sift.ui
 import android.text.format.DateUtils
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -200,6 +201,7 @@ private val defaultSchedule = Schedule(startMinutes = 22 * 60, endMinutes = 7 * 
  * Quiet-hours editor: enable switch, start/end pickers and day-of-week chips. [schedule] null
  * means off; edits flow through [onChange] immediately and the caller decides when to persist.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleEditor(schedule: Schedule?, onChange: (Schedule?) -> Unit) {
     var picking by remember { mutableStateOf<String?>(null) }

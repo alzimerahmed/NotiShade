@@ -22,15 +22,10 @@ object BootMarker {
         runCatching { File(context.filesDir, NAME).writeText("$boot $at") }
     }
 
-    /** How long to wait before a full re-enforcement on the same boot. */
-    const val MIN_INTERVAL_MILLIS = 60_000L
-
     /**
-     * Runs when the boot changed (first connect since boot, or never run), or when at least
-     * [MIN_INTERVAL_MILLIS] passed since the last run on this boot.
+     * Runs only when the boot changed (first connect since boot, or never run). Routine listener
+     * rebinds on the same boot must NOT re-enforce: that would stomp channels the user manually
+     * re-allowed after our policies were applied.
      */
-    fun shouldRun(last: State?, boot: Int, now: Long): Boolean = when (last) {
-        null -> true
-        else -> last.boot != boot || now - last.at >= MIN_INTERVAL_MILLIS
-    }
+    fun shouldRun(last: State?, boot: Int, now: Long): Boolean = last == null || last.boot != boot
 }
