@@ -203,7 +203,7 @@ fun scheduleSummary(off: String, dayLabels: List<String>, s: Schedule?): String 
     }
 }
 
-private val dayNames = listOf(R.string.day_mon, R.string.day_tue, R.string.day_wed, R.string.day_thu, R.string.day_fri, R.string.day_sat, R.string.day_sun)
+val dayNames = listOf(R.string.day_mon, R.string.day_tue, R.string.day_wed, R.string.day_thu, R.string.day_fri, R.string.day_sat, R.string.day_sun)
 
 private fun fmtTime(minutes: Int) = "%02d:%02d".format(minutes / 60, minutes % 60)
 
