@@ -124,6 +124,12 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
     val importSettings = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(vm::importFrom)
     }
+    val exportHistoryCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
+        uri?.let(vm::exportHistoryCsvTo)
+    }
+    val exportHistoryJson = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        uri?.let(vm::exportHistoryJsonTo)
+    }
 
     LaunchedEffect(Unit) {
         var showing: Job? = null
@@ -165,7 +171,10 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
                     nav.push("category/${it.name}")
                 }
                 Tab.APPS -> AppsScreen(apps, history, progress, onTab = { tab = it }) { nav.push("app/$it") }
-                Tab.LOGS -> LogsScreen(history, apps, access, onTab = { tab = it }, nav, vm)
+                Tab.LOGS -> LogsScreen(history, apps, access, onTab = { tab = it }, nav, vm,
+                    onExportCsv = { exportHistoryCsv.launch("sift-history.csv") },
+                    onExportJson = { exportHistoryJson.launch("sift-history.json") },
+                )
                 Tab.RULES -> RulesScreen(store.rules, store.schedules, apps, history, access, onTab = { tab = it }, nav, vm)
                 Tab.SETTINGS -> SettingsScreen(
                     access, store, apps, onTab = { tab = it }, nav, vm,

@@ -31,7 +31,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -91,6 +94,8 @@ fun LogsScreen(
     onTab: (Tab) -> Unit,
     nav: Nav,
     vm: MainViewModel,
+    onExportCsv: () -> Unit = {},
+    onExportJson: () -> Unit = {},
 ) {
     var show by rememberSaveable { mutableStateOf(ShowFilter.ALL) }
     var pkg by rememberSaveable { mutableStateOf<String?>(null) }
@@ -99,6 +104,7 @@ fun LogsScreen(
     var open by remember { mutableStateOf<HistoryEntry?>(null) }
     var ruleDraft by remember { mutableStateOf<Rule?>(null) }
     var confirmClear by remember { mutableStateOf(false) }
+    var exportMenu by remember { mutableStateOf(false) }
 
     val filtered = remember(entries, show, pkg, category, query) {
         val q = query.trim()
@@ -112,7 +118,14 @@ fun LogsScreen(
     TabScaffold(
         Tab.LOGS, onTab,
         actions = {
-            if (entries.isNotEmpty()) IconButton(onClick = { confirmClear = true }) { Icon(Icons.Default.Delete, "Clear history") }
+            if (entries.isNotEmpty()) {
+                IconButton(onClick = { exportMenu = true }) { Icon(Icons.Default.SaveAlt, "Export history") }
+                DropdownMenu(expanded = exportMenu, onDismissRequest = { exportMenu = false }) {
+                    DropdownMenuItem(text = { Text("Export as CSV") }, onClick = { exportMenu = false; onExportCsv() })
+                    DropdownMenuItem(text = { Text("Export as JSON") }, onClick = { exportMenu = false; onExportJson() })
+                }
+                IconButton(onClick = { confirmClear = true }) { Icon(Icons.Default.Delete, "Clear history") }
+            }
         },
     ) {
         Column {

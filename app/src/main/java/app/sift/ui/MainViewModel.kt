@@ -11,6 +11,7 @@ import app.sift.data.Category
 import app.sift.data.CategoryStats
 import app.sift.data.ChannelAction
 import app.sift.data.ChannelInfo
+import app.sift.data.HistoryCodec
 import app.sift.data.HistoryEntry
 import app.sift.data.Rule
 import app.sift.data.Schedule
@@ -162,6 +163,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val out = getApplication<App>().contentResolver.openOutputStream(uri) ?: error("Couldn't open the file")
         out.use { it.write(BackupCodec.encode(app.store.data.value).encodeToByteArray()) }
         say("Settings exported")
+    }
+
+    /** History export; the format is chosen by the caller (CSV or JSON). */
+    fun exportHistoryCsvTo(uri: Uri) = exportHistoryTo(uri, HistoryCodec::encodeCsv, "History exported as CSV")
+
+    fun exportHistoryJsonTo(uri: Uri) = exportHistoryTo(uri, HistoryCodec::encodeJson, "History exported as JSON")
+
+    private fun exportHistoryTo(uri: Uri, encode: (List<HistoryEntry>) -> String, done: String) = launch {
+        val out = getApplication<App>().contentResolver.openOutputStream(uri) ?: error("Couldn't open the file")
+        out.use { it.write(encode(app.history.entries.value).encodeToByteArray()) }
+        say(done)
     }
 
     fun importFrom(uri: Uri) = launch {
