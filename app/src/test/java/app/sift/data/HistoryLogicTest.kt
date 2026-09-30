@@ -32,20 +32,20 @@ class HistoryLogicTest {
 
     @Test fun rapidUpdatesReplaceThePreviousEntry() {
         val a = entry("1", 100)
-        val b = entry("1", 100 + 59_999)
+        val b = entry("1", 100 + 59_999, text = "x 50%")
         assertEquals(listOf(b), HistoryLogic.merge(listOf(a), b, inPlace = false))
     }
 
     @Test fun slowerUpdatesPushANewEntry() {
         val a = entry("1", 100)
-        val b = entry("1", 100 + 60_000)
+        val b = entry("1", 100 + 60_000, text = "x 100%")
         assertEquals(listOf(b, a), HistoryLogic.merge(listOf(a), b, inPlace = false))
     }
 
     @Test fun contentChangeReplacesEvenInPlace() {
         val a = entry("1", 100)
         val blocked = entry("1", 500, outcome = Outcome.BLOCKED)
-        assertEquals(listOf(blocked), HistoryLogic.merge(listOf(a), blocked, inPlace = true))
+        assertEquals(listOf(blocked.copy(time = 100)), HistoryLogic.merge(listOf(a), blocked, inPlace = true))
     }
 
     @Test fun trimDropsExpiredEntries() {
