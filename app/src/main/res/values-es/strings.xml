@@ -65,7 +65,7 @@
 
     <string name="cat_promo">Promociones</string>
     <string name="cat_recommendations">Recomendaciones</string>
-    <string name="cat_news">Noticias y contenido</string>
+    <string name="cat_news">Noticias &amp; contenido</string>
     <string name="cat_social">Actividad social</string>
     <string name="cat_messages">Mensajes</string>
     <string name="cat_calls">Llamadas</string>
