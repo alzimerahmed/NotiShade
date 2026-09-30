@@ -51,9 +51,9 @@ private enum class AppSort { NAME, MOST, BLOCKED }
 
 @Composable
 private fun AppSort.label(): String = when (this) {
-    NAME -> stringResource(R.string.sort_az)
-    MOST -> stringResource(R.string.sort_most)
-    BLOCKED -> stringResource(R.string.sort_most_blocked)
+    AppSort.NAME -> stringResource(R.string.sort_az)
+    AppSort.MOST -> stringResource(R.string.sort_most)
+    AppSort.BLOCKED -> stringResource(R.string.sort_most_blocked)
 }
 
 @Composable

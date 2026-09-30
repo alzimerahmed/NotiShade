@@ -78,9 +78,9 @@ private enum class ShowFilter { ALL, SHOWN, BLOCKED }
 
 @Composable
 private fun ShowFilter.label(): String = when (this) {
-    ALL -> stringResource(R.string.filter_all)
-    SHOWN -> stringResource(R.string.filter_shown)
-    BLOCKED -> stringResource(R.string.filter_blocked)
+    ShowFilter.ALL -> stringResource(R.string.filter_all)
+    ShowFilter.SHOWN -> stringResource(R.string.filter_shown)
+    ShowFilter.BLOCKED -> stringResource(R.string.filter_blocked)
 }
 
 private val HistoryEntry.blocked get() = outcome != Outcome.SHOWN
