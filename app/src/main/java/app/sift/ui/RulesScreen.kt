@@ -188,7 +188,8 @@ private fun RulesEmpty(onCreate: (String, List<String>) -> Unit) {
             Text(stringResource(R.string.or_start_from_idea), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
                 ruleIdeas.forEach { (name, words) ->
-                    SuggestionChip(onClick = { onCreate(stringResource(name), words) }, label = { Text(stringResource(name)) })
+                    val idea = stringResource(name)
+                    SuggestionChip(onClick = { onCreate(idea, words) }, label = { Text(idea) })
                 }
             }
         }

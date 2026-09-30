@@ -295,7 +295,7 @@ private fun CategoryRow(
                 if (channels.allBlocked()) {
                     stringResource(R.string.label_off) + " · $apps$counts"
                 } else {
-                    "$apps · ${statusSummary(channels)}$counts" + policy?.let { " · " + stringResource(R.string.new_fmt, policyLabel(it).lowercase()) }.orEmpty()
+                    "$apps · ${statusSummary(channels)}$counts" + policy?.let { " · " + stringResource(R.string.new_fmt, stringResource(policyLabel(it)).lowercase()) }.orEmpty()
                 },
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
