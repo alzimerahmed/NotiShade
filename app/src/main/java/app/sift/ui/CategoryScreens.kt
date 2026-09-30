@@ -327,7 +327,6 @@ fun CategoryScreen(
     vm: MainViewModel,
 ) {
     val channels = remember(apps, cat) { apps.flatMap { a -> a.channels.filter { it.category == cat } } }
-    val ctx = LocalContext.current
     val switches = rememberCategorySwitches { channels.allBlocked() }
     var filter by rememberSaveable { mutableStateOf<Status?>(null) }
     var selected by remember { mutableStateOf(emptySet<String>()) }
@@ -336,6 +335,8 @@ fun CategoryScreen(
 
     val visible = channels.filter { filter == null || it.status() == filter }.groupBy { it.pkg }
     val visibleKeys = visible.values.flatten().map { it.key }.toSet()
+    val offLabel = stringResource(R.string.label_off)
+    val dayLabels = dayNames.map { stringResource(it) }
 
     fun toggle(keys: Collection<String>) {
         selected = if (keys.all { it in selected }) selected - keys.toSet() else selected + keys
@@ -394,7 +395,7 @@ fun CategoryScreen(
                         supportingContent = {
                             Text(
                                 if (schedule == null) stringResource(R.string.quiet_hours_body)
-                                else stringResource(R.string.blocking_pauses_fmt, scheduleSummary(LocalContext.current, schedule)),
+                                else stringResource(R.string.blocking_pauses_fmt, scheduleSummary(offLabel, dayLabels, schedule)),
                             )
                         },
                         trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
@@ -455,8 +456,11 @@ fun CategoryScreen(
         }
     }
     if (editingSchedule) {
+        val catLabel = stringResource(cat.labelRes)
+        val qhOff = stringResource(R.string.msg_qh_off_fmt, catLabel)
+        val qhOnTemplate = stringResource(R.string.msg_qh_on_fmt)
         ScheduleEditorSheet(
-            stringResource(R.string.quiet_hours_for_fmt, stringResource(cat.labelRes)),
+            stringResource(R.string.quiet_hours_for_fmt, catLabel),
             schedule,
             onDismiss = { editingSchedule = false },
             onSave = { s ->
@@ -464,9 +468,9 @@ fun CategoryScreen(
                 editingSchedule = false
                 vm.say(
                     if (s == null) {
-                        ctx.getString(R.string.msg_qh_off_fmt, ctx.getString(cat.labelRes))
+                        qhOff
                     } else {
-                        ctx.getString(R.string.msg_qh_on_fmt, ctx.getString(cat.labelRes), scheduleSummary(ctx, s))
+                        qhOnTemplate.format(catLabel, scheduleSummary(offLabel, dayLabels, s))
                     },
                 )
             },

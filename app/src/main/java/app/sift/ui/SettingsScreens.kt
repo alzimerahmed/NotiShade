@@ -1,6 +1,5 @@
 package app.sift.ui
 
-import android.content.Context
 import android.text.format.DateUtils
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -194,12 +193,13 @@ fun SettingsScreen(
     }
 }
 
-/** "22:00 – 07:00 · Mon Tue Fri", or "Off". */
-fun scheduleSummary(ctx: Context, s: Schedule?): String = when {
-    s == null || !s.enabled -> ctx.getString(R.string.label_off)
+/** "22:00 – 07:00 · Mon Tue Fri", or "Off". Words are pre-resolved so callers outside
+ *  composition (snackbar callbacks) can use it without querying resources late. */
+fun scheduleSummary(off: String, dayLabels: List<String>, s: Schedule?): String = when {
+    s == null || !s.enabled -> off
     else -> fmtTime(s.startMinutes) + " – " + fmtTime(s.endMinutes) + when {
         s.days.isEmpty() || s.days.size == 7 -> ""
-        else -> " · " + s.days.sorted().joinToString(" ") { ctx.getString(dayNames[it - 1]) }
+        else -> " · " + s.days.sorted().joinToString(" ") { dayLabels[it - 1] }
     }
 }
 
