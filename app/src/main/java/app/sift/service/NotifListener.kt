@@ -22,7 +22,9 @@ import app.sift.data.RuleAction
 import app.sift.data.Schedule
 import app.sift.data.StoreData
 import app.sift.data.keyOf
+import app.sift.widget.BlockedWidgetProvider
 import java.time.ZoneId
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NotifListener : NotificationListenerService() {
@@ -198,6 +200,8 @@ class NotifListener : NotificationListenerService() {
             ),
             inPlace = sbn.isOngoing,
         )
+        // Widget refresh off the hot path; a no-op when nothing is pinned.
+        app.scope.launch(Dispatchers.Default) { runCatching { BlockedWidgetProvider.refresh(applicationContext) } }
     }
 
     /** Overrides first, then the scanned classification, then the classifier fallback. */
