@@ -15,13 +15,8 @@ class BootMarkerTest {
         assertTrue(BootMarker.shouldRun(last, boot = 5, now = last.at + 1_000))
     }
 
-    @Test fun throttlesWithinIntervalOnSameBoot() {
+    @Test fun skipsRoutineRebindOnSameBoot() {
         val last = BootMarker.State(boot = 5, at = 1_000)
-        assertFalse(BootMarker.shouldRun(last, boot = 5, now = last.at + BootMarker.MIN_INTERVAL_MILLIS - 1))
-    }
-
-    @Test fun runsAfterIntervalOnSameBoot() {
-        val last = BootMarker.State(boot = 5, at = 1_000)
-        assertTrue(BootMarker.shouldRun(last, boot = 5, now = last.at + BootMarker.MIN_INTERVAL_MILLIS))
+        assertFalse(BootMarker.shouldRun(last, boot = 5, now = last.at + 60_000))
     }
 }

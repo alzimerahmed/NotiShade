@@ -11,8 +11,6 @@ object BackupCodec {
 
     fun encode(d: StoreData): String = json.encodeToString(StoreData.serializer(), d)
 
-    /** Returns null when the text isn't a readable Sift settings file. */
-    fun decode(text: String): StoreData? = runCatching {
-        json.decodeFromString(StoreData.serializer(), text)
-    }.getOrNull()
+    /** Returns null when the text isn't a readable Sift settings file. Same decode path as the store. */
+    fun decode(text: String): StoreData? = runCatching { StoreMigrations.decode(text) }.getOrNull()
 }

@@ -182,8 +182,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         val blocked = apps.flatMap { a -> a.channels.filter { it.key in imported.logBlocked } }
         if (blocked.isNotEmpty()) app.engine.apply("Restored blocked channels", blocked, ChannelAction.BLOCK)
+        // App defaults only govern future channels; apply them to existing channels too, so a
+        // restore matches what the source device looked like.
+        imported.appDefaults.forEach { (pkg, action) ->
+            val targets = apps.firstOrNull { it.pkg == pkg }?.channels.orEmpty().filter { !alreadyAllowed(it, action) }
+            if (targets.isNotEmpty()) app.engine.apply("Restored: ${action.verb.lowercase()} ${targets.firstOrNull()?.appLabel ?: pkg}", targets, action)
+        }
         say("Settings imported")
     }
+
+    /** "Allow" must not downgrade channels the user set to pop up; the rest are enforced as-is. */
+    private fun alreadyAllowed(c: ChannelInfo, action: ChannelAction) =
+        action == ChannelAction.ALERT && c.channel.importance >= android.app.NotificationManager.IMPORTANCE_DEFAULT
 
     private companion object {
         const val MAX_BACKUP_BYTES = 2_000_000
