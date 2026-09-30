@@ -5,26 +5,26 @@ plugins {
 }
 
 android {
-    namespace = "app.sift"
+    namespace = "app.notishade"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "app.sift"
+        applicationId = "app.notishade"
         minSdk = 33
         targetSdk = 37
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
     }
 
     // Release signing comes from the environment (CI secrets); without it the release APK is built unsigned.
-    val keystore = System.getenv("SIFT_KEYSTORE")?.let(::file)?.takeIf { it.exists() }
+    val keystore = System.getenv("NOTISHADE_KEYSTORE")?.let(::file)?.takeIf { it.exists() }
     signingConfigs {
         if (keystore != null) {
             create("release") {
                 storeFile = keystore
-                storePassword = System.getenv("SIFT_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("SIFT_KEY_ALIAS")
-                keyPassword = System.getenv("SIFT_KEY_PASSWORD")
+                storePassword = System.getenv("NOTISHADE_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("NOTISHADE_KEY_ALIAS")
+                keyPassword = System.getenv("NOTISHADE_KEY_PASSWORD")
             }
         }
     }

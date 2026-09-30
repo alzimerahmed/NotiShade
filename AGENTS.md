@@ -1,16 +1,16 @@
-# Sift — Rules for AI Agents
+# NotiShade — Rules for AI Agents
 
 ## Project
 
-Sift = on-device Android notification category manager (repo: https://github.com/semi-column/sift, owner: semi-column). Control notifications by **what they're about**, across all apps at once: group every app's notification channels into categories (Promotions, Social, Messages, Security, …), block/silence/allow a whole category in one tap, keep a 7-day notification history (Logs) with blocked ones recorded, keyword rules, log exclusions, undo. No root, no account, **no internet permission** — everything stays on the device. Distribution: signed APKs via GitHub Releases (draft, with SHA256SUMS).
+NotiShade = on-device Android notification category manager (repo: https://github.com/alzimerahmed/NotiShade, owner: alzimerahmed). Control notifications by **what they're about**, across all apps at once: group every app's notification channels into categories (Promotions, Social, Messages, Security, …), block/silence/allow a whole category in one tap, keep a 7-day notification history (Logs) with blocked ones recorded, keyword rules, log exclusions, undo. No root, no account, **no internet permission** — everything stays on the device. Distribution: signed APKs via GitHub Releases (draft, with SHA256SUMS).
 
-**License:** GPL-3.0, copyright © 2026 semi-column. Bundles the Inter typeface (SIL OFL 1.1, `docs/licenses/Inter-OFL.txt`).
+**License:** GPL-3.0, copyright © 2026 Alzimer Ahmed. Bundles the Inter typeface (SIL OFL 1.1, `docs/licenses/Inter-OFL.txt`).
 
 **Scope:** Native Android app only. No backend, no network layer, no analytics — the app must never gain the INTERNET permission.
 
 ## How It Works (domain constraints — read before touching the engine)
 
-- Android gives regular apps no API to change other apps' notification settings. Sift uses **Notification Listener access** + a **companion device pairing** (unlocks channel write access, same trick smartwatch companions use). Both are set up in `SetupScreen` / `backend/Access.kt`.
+- Android gives regular apps no API to change other apps' notification settings. NotiShade uses **Notification Listener access** + a **companion device pairing** (unlocks channel write access, same trick smartwatch companions use). Both are set up in `SetupScreen` / `backend/Access.kt`.
 - **Blocking = set channel to IMPORTANCE_MIN** (so Android still delivers notifications to us), then the listener cancels each one on arrival and logs it. IMPORTANCE_NONE is unusable — Android drops those before we see them; `adoptBlocked` converts them to our block.
 - **Categories are inferred** (`data/Classifier.kt`: channel id/name/description keywords, notification-category hints learned at runtime, conversation flag, weak app priors, tie-break toward categories riskier to silence). Users can override per channel.
 - History retention: 7 days, max 5000 entries, batched writes (`data/HistoryStore.kt`). Settings in `data/Store.kt` (single JSON file, atomic writes, migration inline in `load()`).
@@ -23,7 +23,7 @@ Sift = on-device Android notification category manager (repo: https://github.com
 - **DI**: none — manual wiring in `App.kt` (`App.of(context)` service locator). Do not add Hilt/Koin.
 - **Persistence**: kotlinx-serialization JSON files via `AtomicFile` (`Store`, `HistoryStore`). No Room/DataStore.
 - **Networking**: none, by design. Never add Retrofit/OkHttp or the INTERNET permission.
-- **Build**: Gradle Kotlin DSL, single `:app` module, AGP with compileSdk/targetSdk 37, minSdk 33 (Android 13+). Dependencies are declared directly in `app/build.gradle.kts` (no version catalog). R8 minify + resource shrink on release. Debug applicationId `app.sift.debug`.
+- **Build**: Gradle Kotlin DSL, single `:app` module, AGP with compileSdk/targetSdk 37, minSdk 33 (Android 13+). Dependencies are declared directly in `app/build.gradle.kts` (no version catalog). R8 minify + resource shrink on release. Debug applicationId `app.notishade.debug`.
 - **Tests**: JUnit 4, plain JVM unit tests (`testDebugUnitTest`). Android-framework-dependent classes are kept thin; pure logic lives in testable objects (Classifier, RuleMatcher, HistoryLogic, BackupCodec).
 
 ### Architecture & Conventions
@@ -34,7 +34,7 @@ Sift = on-device Android notification category manager (repo: https://github.com
 - **User-facing strings live in `strings.xml`** (extracted in Phase 6) — composables use `stringResource(R.string.x)`, non-composable paths use `Context.getString`/`getQuantityString`; es/de/ar locales exist (ar = RTL test). Persisted data keys (e.g. `Category.label`, batch titles) stay English by design — see `docs/research.md` ADR-007.
 
 ### Build Inputs (secrets — never commit)
-- Release signing via CI secrets: `SIFT_KEYSTORE_BASE64`, `SIFT_KEYSTORE_PASSWORD`, `SIFT_KEY_ALIAS`, `SIFT_KEY_PASSWORD` (see `.github/workflows/release.yml`). Never commit keystore material (`.gitignore` covers `*.jks`, `*.keystore`, `keystore.properties`).
+- Release signing via CI secrets: `NOTISHADE_KEYSTORE_BASE64`, `NOTISHADE_KEYSTORE_PASSWORD`, `NOTISHADE_KEY_ALIAS`, `NOTISHADE_KEY_PASSWORD` (see `.github/workflows/release.yml`). Never commit keystore material (`.gitignore` covers `*.jks`, `*.keystore`, `keystore.properties`).
 
 ## Build / Verify
 

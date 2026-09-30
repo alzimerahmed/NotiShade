@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App identity -->
-    <string name="app_name">Sift</string>
+    <string name="app_name">NotiShade</string>
 
     <!-- Tabs -->
     <string name="tab_categories">Categories</string>
@@ -328,7 +328,7 @@
     <string name="msg_history_exported_json">History exported as JSON</string>
     <string name="err_file_too_large">File is too large</string>
     <string name="err_read_file">Couldn’t read the file</string>
-    <string name="err_not_sift_file">Not a Sift settings file</string>
+    <string name="err_not_sift_file">Not a NotiShade settings file</string>
     <string name="msg_applying_import">Applying imported settings…</string>
     <string name="msg_settings_imported">Settings imported</string>
     <string name="msg_appdefault_keep">New channels of %1$s will keep their own settings</string>

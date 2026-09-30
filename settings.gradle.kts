@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Sift"
+rootProject.name = "NotiShade"
 include(":app")

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sift</string>
+    <string name="app_name">NotiShade</string>
 
     <string name="tab_categories">الفئات</string>
     <string name="tab_apps">التطبيقات</string>
@@ -305,7 +305,7 @@
     <string name="msg_history_exported_json">صُدّر السجل بصيغة JSON</string>
     <string name="err_file_too_large">الملف كبير جدًا</string>
     <string name="err_read_file">تعذّرت قراءة الملف</string>
-    <string name="err_not_sift_file">ليس ملف إعدادات Sift</string>
+    <string name="err_not_sift_file">ليس ملف إعدادات NotiShade</string>
     <string name="msg_applying_import">جارٍ تطبيق الإعدادات المستوردة…</string>
     <string name="msg_settings_imported">استُوردت الإعدادات</string>
     <string name="msg_appdefault_keep">ستحتفظ القنوات الجديدة لـ%1$s بإعداداتها الخاصة</string>

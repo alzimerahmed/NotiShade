@@ -33,15 +33,15 @@ jobs:
 
       - name: Decode signing key
         env:
-          KEYSTORE_BASE64: ${{ secrets.SIFT_KEYSTORE_BASE64 }}
+          KEYSTORE_BASE64: ${{ secrets.NOTISHADE_KEYSTORE_BASE64 }}
         run: echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
 
       - name: Test and build signed APK
         env:
-          SIFT_KEYSTORE: ${{ runner.temp }}/release.jks
-          SIFT_KEYSTORE_PASSWORD: ${{ secrets.SIFT_KEYSTORE_PASSWORD }}
-          SIFT_KEY_ALIAS: ${{ secrets.SIFT_KEY_ALIAS }}
-          SIFT_KEY_PASSWORD: ${{ secrets.SIFT_KEY_PASSWORD }}
+          NOTISHADE_KEYSTORE: ${{ runner.temp }}/release.jks
+          NOTISHADE_KEYSTORE_PASSWORD: ${{ secrets.NOTISHADE_KEYSTORE_PASSWORD }}
+          NOTISHADE_KEY_ALIAS: ${{ secrets.NOTISHADE_KEY_ALIAS }}
+          NOTISHADE_KEY_PASSWORD: ${{ secrets.NOTISHADE_KEY_PASSWORD }}
         run: ./gradlew testDebugUnitTest lintDebug assembleRelease
 
       - name: Verify signature and collect files
@@ -49,14 +49,14 @@ jobs:
           apksigner=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)/apksigner
           "$apksigner" verify --print-certs app/build/outputs/apk/release/app-release.apk
           mkdir dist
-          cp app/build/outputs/apk/release/app-release.apk "dist/Sift-$GITHUB_REF_NAME.apk"
+          cp app/build/outputs/apk/release/app-release.apk "dist/NotiShade-$GITHUB_REF_NAME.apk"
           cd dist && sha256sum *.apk > SHA256SUMS.txt
 
       - name: Upload dry-run APK
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: sift-release-dry-run
+          name: notishade-release-dry-run
           path: dist/
           retention-days: 3
 
@@ -65,7 +65,7 @@ jobs:
         if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --draft --title "Sift $GITHUB_REF_NAME" --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" dist/* --draft --title "NotiShade $GITHUB_REF_NAME" --generate-notes
 
       - name: Remove signing key
         if: always()

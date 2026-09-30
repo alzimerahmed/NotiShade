@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sift</string>
+    <string name="app_name">NotiShade</string>
 
     <string name="tab_categories">Kategorien</string>
     <string name="tab_apps">Apps</string>
@@ -305,7 +305,7 @@
     <string name="msg_history_exported_json">Verlauf als JSON exportiert</string>
     <string name="err_file_too_large">Datei ist zu groß</string>
     <string name="err_read_file">Datei konnte nicht gelesen werden</string>
-    <string name="err_not_sift_file">Keine Sift-Einstellungsdatei</string>
+    <string name="err_not_sift_file">Keine NotiShade-Einstellungsdatei</string>
     <string name="msg_applying_import">Importierte Einstellungen werden angewendet…</string>
     <string name="msg_settings_imported">Einstellungen importiert</string>
     <string name="msg_appdefault_keep">Neue Kanäle von %1$s behalten ihre eigenen Einstellungen</string>
