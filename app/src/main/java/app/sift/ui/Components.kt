@@ -84,6 +84,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import app.sift.R
 import app.sift.data.Category
 import app.sift.data.ChannelAction
 import app.sift.data.ChannelInfo

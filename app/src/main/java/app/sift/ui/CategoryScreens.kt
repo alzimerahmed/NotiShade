@@ -57,6 +57,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.sift.R
 import app.sift.backend.AccessState
 import app.sift.data.AppInfo
 import app.sift.data.Category
@@ -446,7 +447,7 @@ fun CategoryScreen(
                                     Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 }
                             }
-                            StatusText(c.status().label, c.status())
+                            StatusText(stringResource(c.status().labelRes), c.status())
                         }
                     }
                 }

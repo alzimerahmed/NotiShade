@@ -376,7 +376,7 @@ private fun EntrySheet(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CategoryIcon(category, 20.dp)
                         Text(
-                            listOf(category.label, e.channelName).filter { it.isNotBlank() }.joinToString(" \u00b7 "),
+                            listOf(stringResource(category.labelRes), e.channelName).filter { it.isNotBlank() }.joinToString(" \u00b7 "),
                             Modifier.padding(start = 8.dp),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,

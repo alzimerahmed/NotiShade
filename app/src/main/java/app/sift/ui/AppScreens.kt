@@ -206,7 +206,7 @@ fun AppDetailScreen(app: AppInfo?, appDefault: ChannelAction?, nav: Nav, vm: Mai
                 item { EmptyState(stringResource(R.string.no_channels_yet), stringResource(R.string.no_channels_body)) }
             }
             sections.forEach { (cat, channels) ->
-                item(key = "section-${cat.name}") { SectionLabel(cat.label) }
+                item(key = "section-${cat.name}") { SectionLabel(stringResource(cat.labelRes)) }
                 items(channels, key = { it.key }) { c ->
                     val detail = c.channel.description?.takeIf { it.isNotBlank() }
                         ?: c.channel.id.takeIf { c.channel.name.toString() in duplicateNames }
