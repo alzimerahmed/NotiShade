@@ -32,4 +32,9 @@ class StoreMigrationsTest {
         val d = StoreData(schedules = mapOf("cat:PROMO" to Schedule(22 * 60, 7 * 60, days = setOf(1, 2))))
         assertEquals(d, StoreMigrations.decode(StoreMigrations.json.encodeToString(StoreData.serializer(), d)))
     }
+
+    @Test fun missingPausedFallsBackToFalse() {
+        assertEquals(false, StoreMigrations.decode("{}").paused)
+        assertEquals(true, StoreMigrations.decode("""{"paused":true}""").paused)
+    }
 }

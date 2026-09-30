@@ -76,6 +76,17 @@ fun SettingsScreen(
                 )
             }
 
+            item { SectionLabel("Blocking") }
+            item {
+                ListItem(
+                    headlineContent = { Text(if (store.paused) "Paused" else "Active") },
+                    supportingContent = { Text("Pause all blocking and rules; also available as a Quick Settings tile") },
+                    trailingContent = { Switch(checked = store.paused, onCheckedChange = vm::setPaused, colors = quietSwitchColors()) },
+                    colors = clearListItem(),
+                    modifier = Modifier.clickable { vm.setPaused(!store.paused) },
+                )
+            }
+
             item { SectionLabel("Data") }
             item {
                 ListItem(

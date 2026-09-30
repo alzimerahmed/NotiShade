@@ -1,7 +1,9 @@
 package app.sift.ui
 
 import android.app.Application
+import android.content.ComponentName
 import android.net.Uri
+import android.service.quicksettings.TileService
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import app.sift.App
@@ -158,6 +160,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun setTheme(mode: ThemeMode) = app.store.update { it.copy(theme = mode) }
 
     fun setMaterialYou(on: Boolean) = app.store.update { it.copy(materialYou = on) }
+
+    /** Global pause; mirrors the Quick Settings tile, so nudge any pinned tile to refresh. */
+    fun setPaused(on: Boolean) {
+        app.store.update { it.copy(paused = on) }
+        TileService.requestListeningState(getApplication(), ComponentName(getApplication(), PauseTileService::class.java))
+        say(if (on) "Blocking paused — notifications show as usual" else "Blocking resumed")
+    }
 
     fun exportTo(uri: Uri) = launch {
         val out = getApplication<App>().contentResolver.openOutputStream(uri) ?: error("Couldn't open the file")

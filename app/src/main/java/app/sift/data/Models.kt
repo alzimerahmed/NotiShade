@@ -151,4 +151,6 @@ data class StoreData(
     val theme: ThemeMode = ThemeMode.SYSTEM,
     /** Wallpaper-based colours instead of the brand palette. */
     val materialYou: Boolean = false,
+    /** Global pause: while true the listener leaves notifications untouched (Quick Settings tile / Settings toggle). */
+    val paused: Boolean = false,
 )

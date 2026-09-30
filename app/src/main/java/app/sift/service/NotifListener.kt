@@ -91,6 +91,10 @@ class NotifListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification, rankingMap: RankingMap?) {
         if (sbn.packageName == packageName) return
+        // Global pause (Quick Settings tile / Settings): notifications pass through untouched.
+        // Deliberately not logged either — a paused session is a deliberate gap in the log,
+        // not a stream of "shown" entries the user didn't ask to record.
+        if (app.store.data.value.paused) return
         val now = System.currentTimeMillis()
         val zone = ZoneId.systemDefault()
         val channel = channelOf(sbn, rankingMap)
