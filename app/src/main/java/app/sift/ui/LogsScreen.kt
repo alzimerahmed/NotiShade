@@ -59,10 +59,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.sift.backend.AccessState
+import app.sift.R
 import app.sift.data.AppInfo
 import app.sift.data.Category
 import app.sift.data.ChannelAction
@@ -72,7 +74,14 @@ import app.sift.data.Outcome
 import app.sift.data.Rule
 import app.sift.data.Schedule
 
-private enum class ShowFilter(val label: String) { ALL("All"), SHOWN("Shown"), BLOCKED("Blocked") }
+private enum class ShowFilter { ALL, SHOWN, BLOCKED }
+
+@Composable
+private fun ShowFilter.label(): String = when (this) {
+    ALL -> stringResource(R.string.filter_all)
+    SHOWN -> stringResource(R.string.filter_shown)
+    BLOCKED -> stringResource(R.string.filter_blocked)
+}
 
 private val HistoryEntry.blocked get() = outcome != Outcome.SHOWN
 
@@ -81,9 +90,10 @@ private fun matchQuery(e: HistoryEntry, q: String) =
     e.title.contains(q, ignoreCase = true) || e.text.contains(q, ignoreCase = true) ||
         e.app.contains(q, ignoreCase = true) || e.channelName.contains(q, ignoreCase = true)
 
-private fun HistoryEntry.blockLabel() = when (outcome) {
-    Outcome.RULE -> "Removed by rule \u201c$reason\u201d"
-    else -> "Blocked" + channelName.ifBlank { null }?.let { " \u00b7 $it" }.orEmpty()
+@Composable
+private fun HistoryEntry.blockLabel(): String = when (outcome) {
+    Outcome.RULE -> stringResource(R.string.removed_by_rule_fmt, reason.orEmpty())
+    else -> stringResource(R.string.status_blocked) + channelName.ifBlank { null }?.let { " \u00b7 $it" }.orEmpty()
 }
 
 @Composable
@@ -119,36 +129,36 @@ fun LogsScreen(
         Tab.LOGS, onTab,
         actions = {
             if (entries.isNotEmpty()) {
-                IconButton(onClick = { exportMenu = true }) { Icon(Icons.Default.SaveAlt, "Export history") }
+                IconButton(onClick = { exportMenu = true }) { Icon(Icons.Default.SaveAlt, stringResource(R.string.cd_export_history)) }
                 DropdownMenu(expanded = exportMenu, onDismissRequest = { exportMenu = false }) {
-                    DropdownMenuItem(text = { Text("Export as CSV") }, onClick = { exportMenu = false; onExportCsv() })
-                    DropdownMenuItem(text = { Text("Export as JSON") }, onClick = { exportMenu = false; onExportJson() })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.export_csv)) }, onClick = { exportMenu = false; onExportCsv() })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.export_json)) }, onClick = { exportMenu = false; onExportJson() })
                 }
-                IconButton(onClick = { confirmClear = true }) { Icon(Icons.Default.Delete, "Clear history") }
+                IconButton(onClick = { confirmClear = true }) { Icon(Icons.Default.Delete, stringResource(R.string.cd_clear_history)) }
             }
         },
     ) {
         Column {
             if (entries.isEmpty()) {
                 EmptyState(
-                    "No notifications yet",
+                    stringResource(R.string.empty_no_notifications),
                     if (access.listenerConnected) {
-                        "Every notification that arrives from now on is listed here for 7 days, including the ones this app blocks."
+                        stringResource(R.string.empty_logs_body)
                     } else {
-                        "History needs notification access."
+                        stringResource(R.string.logs_need_access)
                     },
-                ) { if (!access.listenerConnected) FilledTonalButton(onClick = { nav.push("setup") }) { Text("Set up access") } }
+                ) { if (!access.listenerConnected) FilledTonalButton(onClick = { nav.push("setup") }) { Text(stringResource(R.string.setup_access)) } }
                 return@Column
             }
             Filters(entries, show, { show = it }, pkg, { pkg = it }, category, { category = it })
             SearchField(
                 query,
                 { query = it },
-                placeholder = "Search title, text or app",
+                placeholder = stringResource(R.string.search_logs),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             )
             if (filtered.isEmpty()) {
-                EmptyState("No matches", "Try different filters or a different search.")
+                EmptyState(stringResource(R.string.empty_no_matches), stringResource(R.string.no_matches_body))
                 return@Column
             }
             HistoryList(filtered) { open = it }
@@ -170,6 +180,7 @@ fun LogsScreen(
     }
     ruleDraft?.let { rule ->
         val store by vm.store.collectAsStateWithLifecycle()
+        val ruleCreatedFmt = stringResource(R.string.rule_created_fmt)
         RuleEditorSheet(
             rule,
             isNew = true,
@@ -178,17 +189,17 @@ fun LogsScreen(
             schedule = store.schedules[Schedule.keyFor(rule.id)],
             onSaveSchedule = { vm.setSchedule(Schedule.keyFor(rule.id), it) },
             onDismiss = { ruleDraft = null },
-            onSave = { vm.saveRule(it); vm.say("Rule \u201c${it.name}\u201d created"); ruleDraft = null },
+            onSave = { vm.saveRule(it); vm.say(ruleCreatedFmt.format(it.name)); ruleDraft = null },
             onDelete = null,
         )
     }
     if (confirmClear) {
         AlertDialog(
             onDismissRequest = { confirmClear = false },
-            title = { Text("Clear history?") },
-            text = { Text("Removes all ${entries.size} saved notifications. Your settings aren't affected.") },
-            confirmButton = { TextButton(onClick = { vm.clearHistory(); confirmClear = false }) { Text("Clear") } },
-            dismissButton = { TextButton(onClick = { confirmClear = false }) { Text("Cancel") } },
+            title = { Text(stringResource(R.string.clear_history_title)) },
+            text = { Text(stringResource(R.string.clear_history_body, entries.size)) },
+            confirmButton = { TextButton(onClick = { vm.clearHistory(); confirmClear = false }) { Text(stringResource(R.string.action_delete)) } },
+            dismissButton = { TextButton(onClick = { confirmClear = false }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
 }
@@ -219,18 +230,18 @@ private fun Filters(
                 ShowFilter.SHOWN -> entries.count { !it.blocked }
                 ShowFilter.BLOCKED -> entries.count { it.blocked }
             }
-            QuietChip("${f.label} $count", show == f) { onShow(f) }
+            QuietChip(f.label() + " $count", show == f) { onShow(f) }
         }
         MenuChip(
-            label = pkg?.let { p -> appsInLog.firstOrNull { it.first == p }?.second ?: p } ?: "App",
+            label = pkg?.let { p -> appsInLog.firstOrNull { it.first == p }?.second ?: p } ?: stringResource(R.string.label_app),
             selected = pkg != null,
-            options = listOf<Pair<String?, String>>(null to "All apps") + appsInLog.map { it.first to "${it.second} (${it.third})" },
+            options = listOf<Pair<String?, String>>(null to stringResource(R.string.all_apps)) + appsInLog.map { it.first to stringResource(R.string.app_option_fmt, it.second, it.third) },
             onPick = onPkg,
         )
         MenuChip(
-            label = category?.label ?: "Category",
+            label = category?.let { stringResource(it.labelRes) } ?: stringResource(R.string.section_category),
             selected = category != null,
-            options = listOf<Pair<Category?, String>>(null to "All categories") + categoriesInLog.map { it.first to "${it.first.label} (${it.second})" },
+            options = listOf<Pair<Category?, String>>(null to stringResource(R.string.all_categories)) + categoriesInLog.map { it.first to stringResource(R.string.category_option_fmt, stringResource(it.first.labelRes), it.second) },
             onPick = onCategory,
         )
     }
@@ -241,11 +252,11 @@ private fun HistoryList(entries: List<HistoryEntry>, onOpen: (HistoryEntry) -> U
     val ctx = LocalContext.current
     val byDay = remember(entries) { entries.groupBy { dayLabel(ctx, it.time) } }
     LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
-        byDay.forEach { (day, list) ->
-            item(key = "day-$day") {
-                val blocked = list.count { it.blocked }
-                SectionLabel(day + if (blocked > 0) "  \u00b7  $blocked blocked" else "")
-            }
+            byDay.forEach { (day, list) ->
+                item(key = "day-$day") {
+                    val blocked = list.count { it.blocked }
+                    SectionLabel(day + if (blocked > 0) stringResource(R.string.day_blocked_fmt, blocked) else "")
+                }
             items(list, key = { "${it.key}@${it.time}" }) { e -> EntryRow(e) { onOpen(e) } }
         }
     }
@@ -286,7 +297,7 @@ private fun EntryRow(e: HistoryEntry, onClick: () -> Unit) {
                         Modifier.align(Alignment.BottomEnd).offset(4.dp, 4.dp).size(18.dp)
                             .background(MaterialTheme.colorScheme.error, CircleShape),
                         contentAlignment = Alignment.Center,
-                    ) { Icon(Icons.Default.Close, "Blocked", Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onError) }
+                    ) { Icon(Icons.Default.Close, stringResource(R.string.cd_blocked), Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onError) }
                 }
             }
         },
@@ -348,9 +359,9 @@ private fun EntrySheet(
                     )
                 }
                 when (e.outcome) {
-                    Outcome.SHOWN -> Pill("Shown")
-                    Outcome.BLOCKED -> Pill("Blocked", color = MaterialTheme.colorScheme.error)
-                    Outcome.RULE -> Pill("Rule", color = MaterialTheme.colorScheme.error)
+                    Outcome.SHOWN -> Pill(stringResource(R.string.pill_shown))
+                    Outcome.BLOCKED -> Pill(stringResource(R.string.status_blocked), color = MaterialTheme.colorScheme.error)
+                    Outcome.RULE -> Pill(stringResource(R.string.pill_rule), color = MaterialTheme.colorScheme.error)
                 }
             }
 
@@ -381,7 +392,7 @@ private fun EntrySheet(
                     }
                     if (e.outcome == Outcome.RULE) {
                         Text(
-                            "Removed by rule \u201c${e.reason}\u201d",
+                            stringResource(R.string.removed_by_rule_fmt, e.reason.orEmpty()),
                             Modifier.padding(top = 4.dp),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.error,
@@ -392,32 +403,32 @@ private fun EntrySheet(
 
             SheetLabel(
                 if (channel != null) {
-                    "All \u201c${channel.channel.name}\u201d notifications"
+                    stringResource(R.string.all_channel_notifs_fmt, channel.channel.name.toString())
                 } else {
-                    "This channel isn't available anymore"
+                    stringResource(R.string.err_channel_unavailable)
                 },
             )
             if (channel != null) {
                 val status = channel.status()
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ActionTile("Allow", Icons.Default.NotificationsActive, status == Status.ALLOWED, Modifier.weight(1f)) {
+                    ActionTile(stringResource(R.string.action_allow), Icons.Default.NotificationsActive, status == Status.ALLOWED, Modifier.weight(1f)) {
                         onAction(ChannelAction.ALERT)
                     }
-                    ActionTile("Silent", Icons.AutoMirrored.Filled.VolumeOff, status == Status.SILENT, Modifier.weight(1f)) {
+                    ActionTile(stringResource(R.string.status_silent), Icons.AutoMirrored.Filled.VolumeOff, status == Status.SILENT, Modifier.weight(1f)) {
                         onAction(ChannelAction.SILENT)
                     }
-                    ActionTile("Block", Icons.Default.Block, status == Status.BLOCKED, Modifier.weight(1f), danger = true) {
+                    ActionTile(stringResource(R.string.action_block), Icons.Default.Block, status == Status.BLOCKED, Modifier.weight(1f), danger = true) {
                         onAction(ChannelAction.BLOCK)
                     }
                 }
             }
 
-            SheetLabel("Only notifications like this one")
+            SheetLabel(stringResource(R.string.sheet_only_like))
             Text(
                 if (candidates.isEmpty()) {
-                    "Create a rule to remove notifications that mention words you choose."
+                    stringResource(R.string.rule_hint_empty)
                 } else {
-                    "Tap the words that give it away, then create a rule. It catches them in any channel."
+                    stringResource(R.string.rule_hint_candidates)
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -434,18 +445,17 @@ private fun EntrySheet(
                 Spacer(Modifier.size(8.dp))
                 Text(
                     when (picked.size) {
-                        0 -> "Create rule"
-                        1 -> "Create rule with 1 word"
-                        else -> "Create rule with ${picked.size} words"
+                        0 -> stringResource(R.string.create_rule)
+                        else -> pluralResource(R.plurals.create_rule_words, picked.size)
                     },
                 )
             }
 
             Row(Modifier.fillMaxWidth().padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (!filteredToApp) TextButton(onClick = onShowApp) { Text("More from ${e.app}", maxLines = 1, overflow = TextOverflow.Ellipsis) }
-                TextButton(onClick = onOpenApp) { Text("App settings") }
+                if (!filteredToApp) TextButton(onClick = onShowApp) { Text(stringResource(R.string.more_from_fmt, e.app), maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                TextButton(onClick = onOpenApp) { Text(stringResource(R.string.app_settings)) }
                 Spacer(Modifier.weight(1f))
-                IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Delete from Logs") }
+                IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, stringResource(R.string.cd_delete_entry)) }
             }
         }
     }
@@ -494,7 +504,7 @@ private fun ActionTile(
             Icon(icon, null, Modifier.size(20.dp))
             Text(label, Modifier.padding(top = 6.dp), style = MaterialTheme.typography.labelLarge)
             Text(
-                if (current) "Current" else " ",
+                if (current) stringResource(R.string.label_current) else " ",
                 style = MaterialTheme.typography.labelSmall,
                 color = LocalContentColor.current.copy(alpha = 0.7f),
             )
@@ -503,7 +513,7 @@ private fun ActionTile(
 }
 
 private fun dayLabel(ctx: Context, time: Long): String = when {
-    DateUtils.isToday(time) -> "Today"
-    DateUtils.isToday(time + DateUtils.DAY_IN_MILLIS) -> "Yesterday"
+    DateUtils.isToday(time) -> ctx.getString(R.string.today)
+    DateUtils.isToday(time + DateUtils.DAY_IN_MILLIS) -> ctx.getString(R.string.yesterday)
     else -> DateUtils.formatDateTime(ctx, time, DateUtils.FORMAT_SHOW_WEEKDAY or DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_YEAR)
 }

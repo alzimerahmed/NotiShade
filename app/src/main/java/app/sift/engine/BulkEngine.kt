@@ -2,6 +2,7 @@ package app.sift.engine
 
 import android.app.NotificationManager
 import app.sift.App
+import app.sift.R
 import app.sift.backend.Channels
 import app.sift.data.Batch
 import app.sift.data.ChannelAction
@@ -18,11 +19,29 @@ import kotlinx.coroutines.withContext
 
 class BulkEngine(private val app: App) {
     data class Outcome(val changed: Int, val unchanged: Int, val locked: Int, val failed: Int, val error: String?, val batch: Batch?) {
-        fun describe(verb: String) = buildString {
-            append(if (changed == 0) "Nothing changed" else "$verb $changed ${if (changed == 1) "channel" else "channels"}")
-            val skipped = locked + failed
-            if (skipped > 0) append(" · $skipped couldn't be changed")
-            if (changed == 0 && error != null) append(": $error")
+        /** Localized summary for snackbars; [app] supplies the string resources. */
+        fun describe(app: App, verb: String): String = describe(
+            changed, locked + failed, error, verb,
+            app.getString(R.string.nothing_changed),
+            { n -> app.resources.getQuantityString(R.plurals.channels_count, n, n) },
+            app.getString(R.string.skipped_fmt),
+        )
+
+        companion object {
+            /** Pure formatting core, unit-testable without Android types. */
+            fun describe(
+                changed: Int,
+                skipped: Int,
+                error: String?,
+                verb: String,
+                nothingChanged: String,
+                channels: (Int) -> String,
+                skippedFmt: String,
+            ): String = buildString {
+                append(if (changed == 0) nothingChanged else "$verb $changed ${channels(changed)}")
+                if (skipped > 0) append(skippedFmt.format(skipped))
+                if (changed == 0 && error != null) append(": $error")
+            }
         }
     }
 

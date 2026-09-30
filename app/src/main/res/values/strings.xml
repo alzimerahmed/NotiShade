@@ -1,4 +1,408 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App identity -->
     <string name="app_name">Sift</string>
+
+    <!-- Tabs -->
+    <string name="tab_categories">Categories</string>
+    <string name="tab_apps">Apps</string>
+    <string name="tab_logs">Logs</string>
+    <string name="tab_rules">Rules</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Generic actions / labels -->
+    <string name="action_undo">Undo</string>
+    <string name="action_allow">Allow</string>
+    <string name="action_silence">Silence</string>
+    <string name="action_block">Block</string>
+    <string name="action_pair">Pair</string>
+    <string name="action_set">Set</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_import">Import</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_back">Back</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_clear">Clear</string>
+    <string name="label_all">All</string>
+    <string name="label_off">Off</string>
+    <string name="label_current">Current</string>
+    <string name="label_optional">Optional</string>
+    <string name="label_app">App</string>
+    <string name="label_this_week">this week</string>
+    <string name="label_days">DAYS</string>
+    <string name="label_today">TODAY</string>
+    <string name="label_good_to_know">GOOD TO KNOW</string>
+
+    <!-- Statuses / importances -->
+    <string name="status_allowed">Allowed</string>
+    <string name="status_silent">Silent</string>
+    <string name="status_blocked">Blocked</string>
+    <string name="status_mixed">Mixed</string>
+    <string name="status_blocked_not_logged">Blocked · not logged</string>
+    <string name="imp_minimized">Minimized</string>
+    <string name="imp_alerting">Alerting</string>
+    <string name="imp_popup">Pop-up</string>
+    <string name="imp_unspecified">Unspecified</string>
+    <string name="all_allowed">All allowed</string>
+
+    <!-- Channel actions -->
+    <string name="action_popup">Pop up</string>
+    <string name="action_alert">Alert</string>
+    <string name="action_silent">Silent</string>
+    <string name="action_minimized">Minimized</string>
+    <string name="action_blocked">Blocked</string>
+    <string name="desc_popup">Sound, and appears on screen</string>
+    <string name="desc_alert">Sound or vibration</string>
+    <string name="desc_silent">In the shade, without sound</string>
+    <string name="desc_minimized">Collapsed at the bottom of the shade</string>
+    <string name="desc_blocked">Never shown, kept in Logs</string>
+
+    <!-- Rule actions -->
+    <string name="rule_action_remove">Remove</string>
+    <string name="rule_action_snooze">Snooze 1 hour</string>
+    <string name="rule_desc_remove">Removed as soon as it arrives, kept in Logs</string>
+    <string name="rule_desc_snooze">Hidden for an hour, then shown again</string>
+
+    <!-- Theme modes -->
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+    <!-- Categories: labels -->
+    <string name="cat_promo">Promotions</string>
+    <string name="cat_recommendations">Recommendations</string>
+    <string name="cat_news">News &amp; content</string>
+    <string name="cat_social">Social activity</string>
+    <string name="cat_messages">Messages</string>
+    <string name="cat_calls">Calls</string>
+    <string name="cat_orders">Orders &amp; delivery</string>
+    <string name="cat_payments">Payments</string>
+    <string name="cat_security">Security</string>
+    <string name="cat_reminders">Reminders</string>
+    <string name="cat_media">Media &amp; ongoing</string>
+    <string name="cat_system">Updates &amp; system</string>
+    <string name="cat_other">Other</string>
+    <!-- Categories: descriptions -->
+    <string name="cat_promo_desc">Offers, deals, coupons and marketing pushes</string>
+    <string name="cat_recommendations_desc">Suggestions, trending and “for you” picks</string>
+    <string name="cat_news_desc">Headlines, new posts, episodes and live updates</string>
+    <string name="cat_social_desc">Likes, comments, follows and mentions</string>
+    <string name="cat_messages_desc">Chats, direct messages and email</string>
+    <string name="cat_calls_desc">Incoming, missed calls and voicemail</string>
+    <string name="cat_orders_desc">Order status, shipping, rides and bookings</string>
+    <string name="cat_payments_desc">Transactions, bills, bank and wallet alerts</string>
+    <string name="cat_security_desc">OTPs, sign-ins and account alerts</string>
+    <string name="cat_reminders_desc">Alarms, timers, calendar and tasks</string>
+    <string name="cat_media_desc">Playback, navigation and running services</string>
+    <string name="cat_system_desc">Downloads, sync, backups and errors</string>
+    <string name="cat_other_desc">Channels that didn’t match any category</string>
+
+    <!-- Category groups (home screen) -->
+    <string name="group_often_noise">Often noise</string>
+    <string name="group_usually_important">Usually important</string>
+    <string name="group_everything_else">Everything else</string>
+
+    <!-- Apps screen -->
+    <string name="sort_az">A–Z</string>
+    <string name="sort_most">Most notifications</string>
+    <string name="sort_most_blocked">Most blocked</string>
+    <string name="chip_has_blocked">Has blocked</string>
+    <string name="chip_system_apps">System apps</string>
+    <string name="chip_no_channels">No channels</string>
+    <string name="empty_no_apps_title">No apps</string>
+    <string name="empty_no_apps_body">Apps appear here after a scan.</string>
+    <string name="empty_no_apps_search">Try another search or filter.</string>
+    <string name="err_read_channels">Couldn’t read channels</string>
+    <string name="err_read_channels_fmt">Couldn’t read channels: %1$s</string>
+    <string name="no_channels_yet">No channels yet</string>
+    <string name="no_channels_body">Apps create channels the first time they need to notify you.</string>
+    <string name="app_not_found">App not found</string>
+    <string name="app_not_found_body">It may have been uninstalled. Try rescanning.</string>
+    <string name="allow_all">Allow all</string>
+    <string name="allow_cat_fmt">Allow %1$s</string>
+    <string name="silence_all">Silence all</string>
+    <string name="block_all">Block all</string>
+    <string name="new_channels">New channels</string>
+    <string name="new_channels_body">Apply the same action to every channel of this app, now and later</string>
+    <string name="appdefault_none">No default</string>
+    <string name="policy_leave">Leave as is</string>
+    <string name="section_behaviour">Behaviour</string>
+    <string name="section_category">Category</string>
+    <string name="override_set_by_you">Set by you</string>
+    <string name="detected_auto_fmt">Detected automatically · %1$d%% match</string>
+    <string name="change">Change</string>
+    <string name="automatic">Automatic</string>
+
+    <!-- Logs screen -->
+    <string name="filter_all">All</string>
+    <string name="filter_shown">Shown</string>
+    <string name="filter_blocked">Blocked</string>
+    <string name="removed_by_rule_fmt">Removed by rule “%1$s”</string>
+    <string name="cd_export_history">Export history</string>
+    <string name="export_csv">Export as CSV</string>
+    <string name="export_json">Export as JSON</string>
+    <string name="cd_clear_history">Clear history</string>
+    <string name="empty_no_notifications">No notifications yet</string>
+    <string name="empty_logs_body">Every notification that arrives from now on is listed here for 7 days, including the ones this app blocks.</string>
+    <string name="logs_need_access">History needs notification access.</string>
+    <string name="setup_access">Set up access</string>
+    <string name="search_logs">Search title, text or app</string>
+    <string name="empty_no_matches">No matches</string>
+    <string name="no_matches_body">Try different filters or a different search.</string>
+    <string name="all_apps">All apps</string>
+    <string name="all_categories">All categories</string>
+    <string name="app_option_fmt">%1$s (%2$d)</string>
+    <string name="category_option_fmt">%1$s (%2$d)</string>
+    <string name="day_blocked_fmt"> · %1$d blocked</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="cd_blocked">Blocked</string>
+    <string name="pill_shown">Shown</string>
+    <string name="pill_rule">Rule</string>
+    <string name="all_channel_notifs_fmt">All “%1$s” notifications</string>
+    <string name="err_channel_unavailable">This channel isn’t available anymore</string>
+    <string name="sheet_only_like">Only notifications like this one</string>
+    <string name="rule_hint_empty">Create a rule to remove notifications that mention words you choose.</string>
+    <string name="rule_hint_candidates">Tap the words that give it away, then create a rule. It catches them in any channel.</string>
+    <string name="create_rule">Create rule</string>
+    <string name="more_from_fmt">More from %1$s</string>
+    <string name="app_settings">App settings</string>
+    <string name="cd_delete_entry">Delete from Logs</string>
+    <string name="clear_history_title">Clear history?</string>
+    <string name="clear_history_body">Removes all %1$d saved notifications. Your settings aren’t affected.</string>
+
+    <!-- Entry sheet -->
+    <string name="rule_created_fmt">Rule “%1$s” created</string>
+
+    <!-- Rules screen -->
+    <string name="new_rule">New rule</string>
+    <string name="edit_rule">Edit rule</string>
+    <string name="rules_paused">Rules are paused</string>
+    <string name="rules_paused_body">They need notification access to see incoming notifications.</string>
+    <string name="rules_intro">Rules catch single notifications by their text, from any channel. Matches may show for a moment before they’re removed, and are listed in Logs.</string>
+    <string name="empty_no_rules">No rules yet</string>
+    <string name="empty_no_rules_body">Some apps send promotions through the same channel as useful updates. A rule removes just the notifications that mention words you choose.</string>
+    <string name="or_start_from_idea">Or start from an idea</string>
+    <string name="idea_sales">Sales &amp; offers</string>
+    <string name="idea_cashback">Cashback &amp; rewards</string>
+    <string name="idea_limited">Limited time</string>
+    <string name="caught_fmt">caught %1$d this week</string>
+    <string name="field_when_mentions">When a notification mentions</string>
+    <string name="field_from">From</string>
+    <string name="field_then">Then</string>
+    <string name="field_name">Name</string>
+    <string name="field_quiet_hours">Quiet hours</string>
+    <string name="cd_remove_keyword">Remove %1$s</string>
+    <string name="keyword_placeholder">A word or phrase, e.g. cashback</string>
+    <string name="keyword_add_placeholder">Add another</string>
+    <string name="cd_add">Add</string>
+    <string name="keyword_hint">Any of these, upper or lower case</string>
+    <string name="match_none">Nothing in Logs matches yet</string>
+    <string name="cd_expand">Expand</string>
+    <string name="cd_collapse">Collapse</string>
+
+    <!-- Settings screen -->
+    <string name="section_access">Access</string>
+    <string name="section_blocking">Blocking</string>
+    <string name="section_data">Data</string>
+    <string name="section_backup">Backup</string>
+    <string name="section_appearance">Appearance</string>
+    <string name="section_about">About</string>
+    <string name="connected">Connected</string>
+    <string name="not_connected">Not connected</string>
+    <string name="access_body">Notification access and device pairing</string>
+    <string name="paused">Paused</string>
+    <string name="active">Active</string>
+    <string name="pause_body">Pause all blocking and rules; also available as a Quick Settings tile</string>
+    <string name="apps_excluded_from_logs">Apps excluded from Logs</string>
+    <string name="all_apps_included">All apps are included</string>
+    <string name="change_history">Change history</string>
+    <string name="no_changes_yet">No changes yet</string>
+    <string name="rescan_apps">Rescan apps</string>
+    <string name="export_settings">Export settings</string>
+    <string name="export_settings_body">Save categories, rules and exclusions to a file</string>
+    <string name="import_settings">Import settings</string>
+    <string name="import_settings_body">Restore from a backup file</string>
+    <string name="material_you">Material You</string>
+    <string name="material_you_body">Use colours from your wallpaper instead of the app’s own palette</string>
+    <string name="version_line_fmt">Version %1$s · Everything stays on this device</string>
+    <string name="import_confirm_title">Import settings?</string>
+    <string name="import_confirm_body">Replaces your current categories, rules, exclusions and appearance with the ones in the backup file.</string>
+
+    <!-- Schedule editor -->
+    <string name="quiet_hours">Quiet hours</string>
+    <string name="use_quiet_hours">Use quiet hours</string>
+    <string name="use_quiet_hours_body">Only apply this inside the time window below</string>
+    <string name="starts">Starts</string>
+    <string name="ends">Ends</string>
+    <string name="overnight">Runs overnight, past midnight.</string>
+    <string name="no_days_hint">No days picked means every day.</string>
+    <string name="days_picked_hint">Only on the days picked above.</string>
+    <string name="starts_at">Starts at</string>
+    <string name="ends_at">Ends at</string>
+    <string name="day_mon">Mon</string>
+    <string name="day_tue">Tue</string>
+    <string name="day_wed">Wed</string>
+    <string name="day_thu">Thu</string>
+    <string name="day_fri">Fri</string>
+    <string name="day_sat">Sat</string>
+    <string name="day_sun">Sun</string>
+
+    <!-- Change history screen -->
+    <string name="change_history_empty_body">Every change you make shows up here and can be undone.</string>
+
+    <!-- Log exclusions screen -->
+    <string name="exclusions_body">Excluded apps’ notifications aren’t saved. Enabling an exclusion also removes that app’s existing history.</string>
+    <string name="search_installed_apps">Search installed apps</string>
+    <string name="chip_excluded_only">Excluded only</string>
+    <string name="apps_not_loaded">Apps not loaded</string>
+    <string name="apps_not_loaded_body">Return to Logs and rescan installed apps.</string>
+    <string name="no_apps_found">No apps found</string>
+    <string name="no_apps_found_body">Try another search.</string>
+
+    <!-- Category screens -->
+    <string name="cd_rescan">Rescan</string>
+    <string name="scanning_apps">Scanning your apps…</string>
+    <string name="empty_home_title">Nothing here yet</string>
+    <string name="empty_home_body">Tap refresh to scan your apps.</string>
+    <string name="of_fmt">%1$d of %2$d</string>
+    <string name="block_all_fmt">Block all %1$s?</string>
+    <string name="cd_open_logs">Open Logs</string>
+    <string name="stat_arrived">arrived</string>
+    <string name="stat_kept_out">kept out</string>
+    <string name="noisiest_fmt">Noisiest · %1$s · %2$d</string>
+    <string name="new_fmt">new: %1$s</string>
+    <string name="off_for_every_app">Off for every app</string>
+    <string name="new_channels_when">When an app adds one in this category</string>
+    <string name="quiet_hours_body">Apply the block only at certain times</string>
+    <string name="blocking_pauses_fmt">Blocking pauses outside %1$s</string>
+    <string name="no_channels_match">No channels match this filter.</string>
+    <string name="select_all">Select all</string>
+    <string name="cd_clear_selection">Clear selection</string>
+    <string name="quiet_hours_for_fmt">%1$s quiet hours</string>
+
+    <!-- Setup screen -->
+    <string name="finish_to_continue">Finish both steps to continue</string>
+    <string name="setup_tagline">Sort your notifications by what they’re about</string>
+    <string name="setup_connect">Connect</string>
+    <string name="setup_connect_body">Android only lets trusted helpers change other apps’ notification settings. Two quick steps, no root needed.</string>
+    <string name="setup_step1">Allow notification access</string>
+    <string name="setup_step2">Pair with a nearby device</string>
+    <string name="restricted_hint">Switch greyed out? Open App info → ⋮ → Allow restricted settings, then try again.</string>
+    <string name="app_info">App info</string>
+    <string name="pairing_hint">Choose any Bluetooth device or Wi-Fi network. It only unlocks Android’s channel controls. Nothing is sent to it.</string>
+    <string name="bullet1">Every notification is logged for 7 days. Blocked ones are hidden as they arrive and marked in Logs.</string>
+    <string name="bullet2">Categories already off in Android Settings are taken over, so they’re logged too.</string>
+    <string name="bullet3">Apps whose main notification switch is off can’t be logged. Turn it on and block their categories here instead.</string>
+    <string name="bullet4">Rules remove matching notifications as they arrive, so they may appear for a moment.</string>
+    <string name="hide_emulator_commands">Hide emulator commands</string>
+    <string name="testing_on_emulator">Testing on an emulator?</string>
+    <string name="run_from_computer">Run from your computer:</string>
+    <string name="cd_done">Done</string>
+    <string name="err_pairing_unavailable">Device pairing isn’t available on this phone</string>
+    <string name="err_pairing_failed">Pairing failed</string>
+
+    <!-- Tile &amp; widget -->
+    <string name="tile_pause">Pause blocking</string>
+    <string name="tile_paused">Blocking paused</string>
+    <string name="tile_active">Blocking active</string>
+    <string name="widget_label">Blocked notifications</string>
+    <string name="widget_title">Blocked</string>
+    <string name="widget_empty">No blocked notifications yet</string>
+
+    <!-- Snackbar / VM messages -->
+    <string name="msg_already_allowed">Already allowed</string>
+    <string name="nothing_changed">Nothing changed</string>
+    <string name="skipped_fmt"> · %1$d couldn’t be changed</string>
+    <string name="all_channels">All channels</string>
+    <string name="undone">Undone</string>
+    <string name="verb_restored">Restored</string>
+    <string name="err_category_unavailable">That category isn’t available anymore</string>
+    <string name="msg_paused_on">Blocking paused — notifications show as usual</string>
+    <string name="msg_paused_off">Blocking resumed</string>
+    <string name="err_open_file">Couldn’t open the file</string>
+    <string name="msg_settings_exported">Settings exported</string>
+    <string name="msg_history_exported_csv">History exported as CSV</string>
+    <string name="msg_history_exported_json">History exported as JSON</string>
+    <string name="err_file_too_large">File is too large</string>
+    <string name="err_read_file">Couldn’t read the file</string>
+    <string name="err_not_sift_file">Not a Sift settings file</string>
+    <string name="msg_applying_import">Applying imported settings…</string>
+    <string name="msg_settings_imported">Settings imported</string>
+    <string name="msg_appdefault_keep">New channels of %1$s will keep their own settings</string>
+    <string name="msg_appdefault_willbe">New channels of %1$s will be %2$s</string>
+    <string name="msg_qh_off_fmt">Quiet hours off for %1$s</string>
+    <string name="msg_qh_on_fmt">Quiet hours for %1$s · %2$s</string>
+
+    <!-- Plurals -->
+    <plurals name="apps_count">
+        <item quantity="one">%1$d app</item>
+        <item quantity="other">%1$d apps</item>
+    </plurals>
+    <plurals name="channels_count">
+        <item quantity="one">%1$d channel</item>
+        <item quantity="other">%1$d channels</item>
+    </plurals>
+    <plurals name="blocked_count">
+        <item quantity="one">%1$d blocked</item>
+        <item quantity="other">%1$d blocked</item>
+    </plurals>
+    <plurals name="silent_count">
+        <item quantity="one">%1$d silent</item>
+        <item quantity="other">%1$d silent</item>
+    </plurals>
+    <plurals name="shown_count">
+        <item quantity="one">%1$d shown</item>
+        <item quantity="other">%1$d shown</item>
+    </plurals>
+    <plurals name="notifications_count">
+        <item quantity="one">%1$d notification</item>
+        <item quantity="other">%1$d notifications</item>
+    </plurals>
+    <plurals name="changes_count">
+        <item quantity="one">%1$d change you can undo</item>
+        <item quantity="other">%1$d changes you can undo</item>
+    </plurals>
+    <plurals name="excluded_apps_count">
+        <item quantity="one">%1$d app excluded</item>
+        <item quantity="other">%1$d apps excluded</item>
+    </plurals>
+    <plurals name="excluded_count">
+        <item quantity="one">%1$d excluded</item>
+        <item quantity="other">%1$d excluded</item>
+    </plurals>
+    <plurals name="apps_scanned_count">
+        <item quantity="one">%1$d app scanned</item>
+        <item quantity="other">%1$d apps scanned</item>
+    </plurals>
+    <plurals name="msg_scanned">
+        <item quantity="one">Scanned %1$d app</item>
+        <item quantity="other">Scanned %1$d apps</item>
+    </plurals>
+    <plurals name="search_apps">
+        <item quantity="one">Search %1$d app</item>
+        <item quantity="other">Search %1$d apps</item>
+    </plurals>
+    <plurals name="create_rule_words">
+        <item quantity="one">Create rule with %1$d word</item>
+        <item quantity="other">Create rule with %1$d words</item>
+    </plurals>
+    <plurals name="would_catch">
+        <item quantity="one">Would have caught %1$d notification in Logs</item>
+        <item quantity="other">Would have caught %1$d notifications in Logs</item>
+    </plurals>
+    <plurals name="selected_count">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
+    <plurals name="widget_count">
+        <item quantity="one">%1$d in 7 days</item>
+        <item quantity="other">%1$d in 7 days</item>
+    </plurals>
+    <plurals name="block_confirm">
+        <item quantity="one">%2$s from %1$d app will be hidden and kept in Logs. You can undo this.</item>
+        <item quantity="other">%2$s from %1$d apps will be hidden and kept in Logs. You can undo this.</item>
+    </plurals>
 </resources>

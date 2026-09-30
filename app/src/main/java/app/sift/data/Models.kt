@@ -2,34 +2,38 @@ package app.sift.data
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import androidx.annotation.StringRes
+import app.sift.R
 import kotlinx.serialization.Serializable
 
+// `label`/`description` stay as English keys because they leak into persisted data
+// (batch titles, rule names); UI renders the localized [labelRes]/[descRes] instead.
 @Serializable
-enum class Category(val label: String, val description: String) {
-    PROMO("Promotions", "Offers, deals, coupons and marketing pushes"),
-    RECOMMENDATIONS("Recommendations", "Suggestions, trending and \"for you\" picks"),
-    NEWS("News & content", "Headlines, new posts, episodes and live updates"),
-    SOCIAL("Social activity", "Likes, comments, follows and mentions"),
-    MESSAGES("Messages", "Chats, direct messages and email"),
-    CALLS("Calls", "Incoming, missed calls and voicemail"),
-    ORDERS("Orders & delivery", "Order status, shipping, rides and bookings"),
-    PAYMENTS("Payments", "Transactions, bills, bank and wallet alerts"),
-    SECURITY("Security", "OTPs, sign-ins and account alerts"),
-    REMINDERS("Reminders", "Alarms, timers, calendar and tasks"),
-    MEDIA("Media & ongoing", "Playback, navigation and running services"),
-    SYSTEM("Updates & system", "Downloads, sync, backups and errors"),
-    OTHER("Other", "Channels that didn't match any category"),
+enum class Category(val label: String, val description: String, @StringRes val labelRes: Int, @StringRes val descRes: Int) {
+    PROMO("Promotions", "Offers, deals, coupons and marketing pushes", R.string.cat_promo, R.string.cat_promo_desc),
+    RECOMMENDATIONS("Recommendations", "Suggestions, trending and \"for you\" picks", R.string.cat_recommendations, R.string.cat_recommendations_desc),
+    NEWS("News & content", "Headlines, new posts, episodes and live updates", R.string.cat_news, R.string.cat_news_desc),
+    SOCIAL("Social activity", "Likes, comments, follows and mentions", R.string.cat_social, R.string.cat_social_desc),
+    MESSAGES("Messages", "Chats, direct messages and email", R.string.cat_messages, R.string.cat_messages_desc),
+    CALLS("Calls", "Incoming, missed calls and voicemail", R.string.cat_calls, R.string.cat_calls_desc),
+    ORDERS("Orders & delivery", "Order status, shipping, rides and bookings", R.string.cat_orders, R.string.cat_orders_desc),
+    PAYMENTS("Payments", "Transactions, bills, bank and wallet alerts", R.string.cat_payments, R.string.cat_payments_desc),
+    SECURITY("Security", "OTPs, sign-ins and account alerts", R.string.cat_security, R.string.cat_security_desc),
+    REMINDERS("Reminders", "Alarms, timers, calendar and tasks", R.string.cat_reminders, R.string.cat_reminders_desc),
+    MEDIA("Media & ongoing", "Playback, navigation and running services", R.string.cat_media, R.string.cat_media_desc),
+    SYSTEM("Updates & system", "Downloads, sync, backups and errors", R.string.cat_system, R.string.cat_system_desc),
+    OTHER("Other", "Channels that didn't match any category", R.string.cat_other, R.string.cat_other_desc),
 }
 
 @Serializable
-enum class ChannelAction(val label: String, val description: String, val verb: String, val importance: Int) {
-    POPUP("Pop up", "Sound, and appears on screen", "Set to pop up", NotificationManager.IMPORTANCE_HIGH),
-    ALERT("Alert", "Sound or vibration", "Allowed", NotificationManager.IMPORTANCE_DEFAULT),
-    SILENT("Silent", "In the shade, without sound", "Silenced", NotificationManager.IMPORTANCE_LOW),
-    MINIMIZE("Minimized", "Collapsed at the bottom of the shade", "Minimized", NotificationManager.IMPORTANCE_MIN),
+enum class ChannelAction(val label: String, val description: String, val verb: String, val importance: Int, @StringRes val labelRes: Int, @StringRes val descRes: Int) {
+    POPUP("Pop up", "Sound, and appears on screen", "Set to pop up", NotificationManager.IMPORTANCE_HIGH, R.string.action_popup, R.string.desc_popup),
+    ALERT("Alert", "Sound or vibration", "Allowed", NotificationManager.IMPORTANCE_DEFAULT, R.string.action_alert, R.string.desc_alert),
+    SILENT("Silent", "In the shade, without sound", "Silenced", NotificationManager.IMPORTANCE_LOW, R.string.action_silent, R.string.desc_silent),
+    MINIMIZE("Minimized", "Collapsed at the bottom of the shade", "Minimized", NotificationManager.IMPORTANCE_MIN, R.string.action_minimized, R.string.desc_minimized),
 
     // Minimized so Android still delivers them to us; the listener removes each one on arrival and logs it.
-    BLOCK("Blocked", "Never shown, kept in Logs", "Blocked", NotificationManager.IMPORTANCE_MIN),
+    BLOCK("Blocked", "Never shown, kept in Logs", "Blocked", NotificationManager.IMPORTANCE_MIN, R.string.action_blocked, R.string.desc_blocked),
 }
 
 fun importanceLabel(importance: Int) = when (importance) {
@@ -95,9 +99,9 @@ data class ChannelChange(
 data class Batch(val id: Long, val time: Long, val title: String, val changes: List<ChannelChange>)
 
 @Serializable
-enum class RuleAction(val label: String, val description: String) {
-    DISMISS("Remove", "Removed as soon as it arrives, kept in Logs"),
-    SNOOZE("Snooze 1 hour", "Hidden for an hour, then shown again"),
+enum class RuleAction(val label: String, val description: String, @StringRes val labelRes: Int, @StringRes val descRes: Int) {
+    DISMISS("Remove", "Removed as soon as it arrives, kept in Logs", R.string.rule_action_remove, R.string.rule_desc_remove),
+    SNOOZE("Snooze 1 hour", "Hidden for an hour, then shown again", R.string.rule_action_snooze, R.string.rule_desc_snooze),
 }
 
 @Serializable
@@ -131,7 +135,7 @@ data class HistoryEntry(
 )
 
 @Serializable
-enum class ThemeMode(val label: String) { SYSTEM("System"), LIGHT("Light"), DARK("Dark") }
+enum class ThemeMode(val label: String, @StringRes val labelRes: Int) { SYSTEM("System", R.string.theme_system), LIGHT("Light", R.string.theme_light), DARK("Dark", R.string.theme_dark) }
 
 @Serializable
 data class StoreData(

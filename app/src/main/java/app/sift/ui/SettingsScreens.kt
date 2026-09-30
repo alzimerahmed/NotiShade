@@ -1,5 +1,6 @@
 package app.sift.ui
 
+import android.content.Context
 import android.text.format.DateUtils
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,8 +42,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.sift.BuildConfig
+import app.sift.R
 import app.sift.backend.AccessState
 import app.sift.data.AppInfo
 import app.sift.data.Batch
@@ -65,35 +68,35 @@ fun SettingsScreen(
     var confirmImport by remember { mutableStateOf(false) }
     TabScaffold(Tab.SETTINGS, onTab) {
         LazyColumn {
-            item { SectionLabel("Access") }
+            item { SectionLabel(stringResource(R.string.section_access)) }
             item {
                 ListItem(
-                    headlineContent = { Text(if (access.ready) "Connected" else "Not connected") },
-                    supportingContent = { Text("Notification access and device pairing") },
+                    headlineContent = { Text(if (access.ready) stringResource(R.string.connected) else stringResource(R.string.not_connected)) },
+                    supportingContent = { Text(stringResource(R.string.access_body)) },
                     trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
                     colors = clearListItem(),
                     modifier = Modifier.clickable { nav.push("setup") },
                 )
             }
 
-            item { SectionLabel("Blocking") }
+            item { SectionLabel(stringResource(R.string.section_blocking)) }
             item {
                 ListItem(
-                    headlineContent = { Text(if (store.paused) "Paused" else "Active") },
-                    supportingContent = { Text("Pause all blocking and rules; also available as a Quick Settings tile") },
+                    headlineContent = { Text(if (store.paused) stringResource(R.string.paused) else stringResource(R.string.active)) },
+                    supportingContent = { Text(stringResource(R.string.pause_body)) },
                     trailingContent = { Switch(checked = store.paused, onCheckedChange = vm::setPaused, colors = quietSwitchColors()) },
                     colors = clearListItem(),
                     modifier = Modifier.clickable { vm.setPaused(!store.paused) },
                 )
             }
 
-            item { SectionLabel("Data") }
+            item { SectionLabel(stringResource(R.string.section_data)) }
             item {
                 ListItem(
-                    headlineContent = { Text("Apps excluded from Logs") },
+                    headlineContent = { Text(stringResource(R.string.apps_excluded_from_logs)) },
                     supportingContent = {
                         val count = store.logExcludedApps.size
-                        Text(if (count == 0) "All apps are included" else "$count ${if (count == 1) "app" else "apps"} excluded")
+                        Text(if (count == 0) stringResource(R.string.all_apps_included) else pluralResource(R.plurals.excluded_apps_count, count))
                     },
                     trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
                     colors = clearListItem(),
@@ -102,13 +105,12 @@ fun SettingsScreen(
             }
             item {
                 ListItem(
-                    headlineContent = { Text("Change history") },
+                    headlineContent = { Text(stringResource(R.string.change_history)) },
                     supportingContent = {
                         Text(
                             when (historyCount) {
-                                0 -> "No changes yet"
-                                1 -> "1 change you can undo"
-                                else -> "$historyCount changes you can undo"
+                                0 -> stringResource(R.string.no_changes_yet)
+                                else -> pluralResource(R.plurals.changes_count, historyCount)
                             },
                         )
                     },
@@ -119,19 +121,19 @@ fun SettingsScreen(
             }
             item {
                 ListItem(
-                    headlineContent = { Text("Rescan apps") },
-                    supportingContent = { Text("${apps.size} apps scanned") },
+                    headlineContent = { Text(stringResource(R.string.rescan_apps)) },
+                    supportingContent = { Text(pluralResource(R.plurals.apps_scanned_count, apps.size)) },
                     trailingContent = { Icon(Icons.Default.Refresh, null) },
                     colors = clearListItem(),
                     modifier = Modifier.clickable(enabled = access.ready) { vm.scan() },
                 )
             }
 
-            item { SectionLabel("Backup") }
+            item { SectionLabel(stringResource(R.string.section_backup)) }
             item {
                 ListItem(
-                    headlineContent = { Text("Export settings") },
-                    supportingContent = { Text("Save categories, rules and exclusions to a file") },
+                    headlineContent = { Text(stringResource(R.string.export_settings)) },
+                    supportingContent = { Text(stringResource(R.string.export_settings_body)) },
                     trailingContent = { Icon(Icons.Default.SaveAlt, null) },
                     colors = clearListItem(),
                     modifier = Modifier.clickable(onClick = onExport),
@@ -139,15 +141,15 @@ fun SettingsScreen(
             }
             item {
                 ListItem(
-                    headlineContent = { Text("Import settings") },
-                    supportingContent = { Text("Restore from a backup file") },
+                    headlineContent = { Text(stringResource(R.string.import_settings)) },
+                    supportingContent = { Text(stringResource(R.string.import_settings_body)) },
                     trailingContent = { Icon(Icons.Default.FolderOpen, null) },
                     colors = clearListItem(),
                     modifier = Modifier.clickable { confirmImport = true },
                 )
             }
 
-            item { SectionLabel("Appearance") }
+            item { SectionLabel(stringResource(R.string.section_appearance)) }
             item {
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
                     ThemeMode.entries.forEachIndexed { i, mode ->
@@ -155,25 +157,25 @@ fun SettingsScreen(
                             selected = store.theme == mode,
                             onClick = { vm.setTheme(mode) },
                             shape = SegmentedButtonDefaults.itemShape(i, ThemeMode.entries.size),
-                        ) { Text(mode.label) }
+                        ) { Text(stringResource(mode.labelRes)) }
                     }
                 }
             }
             item {
                 ListItem(
-                    headlineContent = { Text("Material You") },
-                    supportingContent = { Text("Use colours from your wallpaper instead of the app\u2019s own palette") },
+                    headlineContent = { Text(stringResource(R.string.material_you)) },
+                    supportingContent = { Text(stringResource(R.string.material_you_body)) },
                     trailingContent = { Switch(checked = store.materialYou, onCheckedChange = vm::setMaterialYou, colors = quietSwitchColors()) },
                     colors = clearListItem(),
                     modifier = Modifier.clickable { vm.setMaterialYou(!store.materialYou) },
                 )
             }
 
-            item { SectionLabel("About") }
+            item { SectionLabel(stringResource(R.string.section_about)) }
             item {
                 ListItem(
                     headlineContent = { Wordmark(MaterialTheme.typography.titleMedium) },
-                    supportingContent = { Text("Version ${BuildConfig.VERSION_NAME} · Everything stays on this device") },
+                    supportingContent = { Text(stringResource(R.string.version_line_fmt, BuildConfig.VERSION_NAME)) },
                     leadingContent = { BrandMark(38.dp) },
                     colors = clearListItem(),
                 )
@@ -184,24 +186,24 @@ fun SettingsScreen(
     if (confirmImport) {
         AlertDialog(
             onDismissRequest = { confirmImport = false },
-            title = { Text("Import settings?") },
-            text = { Text("Replaces your current categories, rules, exclusions and appearance with the ones in the backup file.") },
-            confirmButton = { TextButton(onClick = { confirmImport = false; onImport() }) { Text("Import") } },
-            dismissButton = { TextButton(onClick = { confirmImport = false }) { Text("Cancel") } },
+            title = { Text(stringResource(R.string.import_confirm_title)) },
+            text = { Text(stringResource(R.string.import_confirm_body)) },
+            confirmButton = { TextButton(onClick = { confirmImport = false; onImport() }) { Text(stringResource(R.string.action_import)) } },
+            dismissButton = { TextButton(onClick = { confirmImport = false }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
 }
 
 /** "22:00 – 07:00 · Mon Tue Fri", or "Off". */
-fun scheduleSummary(s: Schedule?): String = when {
-    s == null || !s.enabled -> "Off"
-    else -> "${fmtTime(s.startMinutes)} – ${fmtTime(s.endMinutes)}" + when {
+fun scheduleSummary(ctx: Context, s: Schedule?): String = when {
+    s == null || !s.enabled -> ctx.getString(R.string.label_off)
+    else -> fmtTime(s.startMinutes) + " – " + fmtTime(s.endMinutes) + when {
         s.days.isEmpty() || s.days.size == 7 -> ""
-        else -> " · " + s.days.sorted().joinToString(" ") { dayNames[it - 1] }
+        else -> " · " + s.days.sorted().joinToString(" ") { ctx.getString(dayNames[it - 1]) }
     }
 }
 
-private val dayNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+private val dayNames = listOf(R.string.day_mon, R.string.day_tue, R.string.day_wed, R.string.day_thu, R.string.day_fri, R.string.day_sat, R.string.day_sun)
 
 private fun fmtTime(minutes: Int) = "%02d:%02d".format(minutes / 60, minutes % 60)
 
@@ -218,8 +220,8 @@ fun ScheduleEditor(schedule: Schedule?, onChange: (Schedule?) -> Unit) {
     var picking by remember { mutableStateOf<String?>(null) }
 
     ListItem(
-        headlineContent = { Text("Use quiet hours") },
-        supportingContent = { Text("Only apply this inside the time window below") },
+        headlineContent = { Text(stringResource(R.string.use_quiet_hours)) },
+        supportingContent = { Text(stringResource(R.string.use_quiet_hours_body)) },
         trailingContent = {
             Switch(checked = schedule != null, onCheckedChange = { on -> onChange(if (on) defaultSchedule else null) }, colors = quietSwitchColors())
         },
@@ -227,25 +229,25 @@ fun ScheduleEditor(schedule: Schedule?, onChange: (Schedule?) -> Unit) {
     )
     if (schedule != null) {
         ListItem(
-            headlineContent = { Text("Starts") },
+            headlineContent = { Text(stringResource(R.string.starts)) },
             trailingContent = { TextButton(onClick = { picking = "start" }) { Text(fmtTime(schedule.startMinutes)) } },
             colors = clearListItem(),
         )
         ListItem(
-            headlineContent = { Text("Ends") },
+            headlineContent = { Text(stringResource(R.string.ends)) },
             trailingContent = { TextButton(onClick = { picking = "end" }) { Text(fmtTime(schedule.endMinutes)) } },
             colors = clearListItem(),
         )
         if (schedule.startMinutes > schedule.endMinutes) {
             Text(
-                "Runs overnight, past midnight.",
+                stringResource(R.string.overnight),
                 Modifier.padding(horizontal = 16.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Text(
-            "DAYS",
+            stringResource(R.string.label_days),
             Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
             style = OvertypeLabel,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -256,14 +258,14 @@ fun ScheduleEditor(schedule: Schedule?, onChange: (Schedule?) -> Unit) {
         ) {
             dayNames.forEachIndexed { i, name ->
                 val isoDay = i + 1
-                QuietChip(name, isoDay in schedule.days) {
+                QuietChip(stringResource(name), isoDay in schedule.days) {
                     val days = if (isoDay in schedule.days) schedule.days - isoDay else schedule.days + isoDay
                     onChange(schedule.copy(days = days))
                 }
             }
         }
         Text(
-            if (schedule.days.isEmpty()) "No days picked means every day." else "Only on the days picked above.",
+            if (schedule.days.isEmpty()) stringResource(R.string.no_days_hint) else stringResource(R.string.days_picked_hint),
             Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -275,16 +277,16 @@ fun ScheduleEditor(schedule: Schedule?, onChange: (Schedule?) -> Unit) {
             val state = rememberTimePickerState(minutes / 60, minutes % 60, is24Hour = true)
             AlertDialog(
                 onDismissRequest = { picking = null },
-                title = { Text(if (start) "Starts at" else "Ends at") },
+                title = { Text(if (start) stringResource(R.string.starts_at) else stringResource(R.string.ends_at)) },
                 text = { TimePicker(state) },
                 confirmButton = {
                     TextButton(onClick = {
                         val value = state.hour * 60 + state.minute
                         onChange(if (start) schedule.copy(startMinutes = value) else schedule.copy(endMinutes = value))
                         picking = null
-                    }) { Text("Set") }
+                    }) { Text(stringResource(R.string.action_set)) }
                 },
-                dismissButton = { TextButton(onClick = { picking = null }) { Text("Cancel") } },
+                dismissButton = { TextButton(onClick = { picking = null }) { Text(stringResource(R.string.action_cancel)) } },
             )
         }
     }
@@ -305,10 +307,10 @@ fun ScheduleEditorSheet(
             Text(title, Modifier.padding(horizontal = 24.dp), style = MaterialTheme.typography.headlineSmall)
             ScheduleEditor(draft) { draft = it }
             Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
                 Spacer(Modifier.weight(1f))
                 // Always enabled: saving a null draft is how a schedule gets cleared.
-                Button(onClick = { onSave(draft) }) { Text("Save") }
+                Button(onClick = { onSave(draft) }) { Text(stringResource(R.string.action_save)) }
             }
         }
     }
@@ -316,9 +318,9 @@ fun ScheduleEditorSheet(
 
 @Composable
 fun HistoryScreen(history: List<Batch>, nav: Nav, vm: MainViewModel) {
-    DetailScaffold("Change history", nav::back) {
+    DetailScaffold(stringResource(R.string.change_history), nav::back) {
         if (history.isEmpty()) {
-            EmptyState("No changes yet", "Every change you make shows up here and can be undone.")
+            EmptyState(stringResource(R.string.no_changes_yet), stringResource(R.string.change_history_empty_body))
             return@DetailScaffold
         }
         LazyColumn {
@@ -326,9 +328,9 @@ fun HistoryScreen(history: List<Batch>, nav: Nav, vm: MainViewModel) {
                 ListItem(
                     headlineContent = { Text(b.title) },
                     supportingContent = {
-                        Text("${b.changes.size} ${if (b.changes.size == 1) "channel" else "channels"} · ${DateUtils.getRelativeTimeSpanString(b.time)}")
+                        Text(pluralResource(R.plurals.channels_count, b.changes.size) + " · " + DateUtils.getRelativeTimeSpanString(b.time))
                     },
-                    trailingContent = { TextButton(onClick = { vm.undo(b) }) { Text("Undo") } },
+                    trailingContent = { TextButton(onClick = { vm.undo(b) }) { Text(stringResource(R.string.action_undo)) } },
                     colors = clearListItem(),
                 )
             }

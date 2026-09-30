@@ -52,6 +52,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -71,11 +73,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 
 private val categoryGroups = listOf(
-    "Often noise" to listOf(Category.PROMO, Category.RECOMMENDATIONS, Category.SOCIAL, Category.NEWS),
-    "Usually important" to listOf(
+    R.string.group_often_noise to listOf(Category.PROMO, Category.RECOMMENDATIONS, Category.SOCIAL, Category.NEWS),
+    R.string.group_usually_important to listOf(
         Category.MESSAGES, Category.CALLS, Category.SECURITY, Category.PAYMENTS, Category.ORDERS, Category.REMINDERS,
     ),
-    "Everything else" to listOf(Category.MEDIA, Category.SYSTEM, Category.OTHER),
+    R.string.group_everything_else to listOf(Category.MEDIA, Category.SYSTEM, Category.OTHER),
 )
 
 // Blocking these by accident means missed OTPs, calls or alarms, so ask first.
@@ -150,13 +152,13 @@ fun HomeScreen(
     TabScaffold(
         Tab.CATEGORIES, onTab, progress,
         actions = {
-            if (progress == null) IconButton(onClick = vm::scan) { Icon(Icons.Default.Refresh, "Rescan") }
+            if (progress == null) IconButton(onClick = vm::scan) { Icon(Icons.Default.Refresh, stringResource(R.string.cd_rescan)) }
         },
     ) {
         if (byCategory.isEmpty()) {
             EmptyState(
-                if (progress != null) "Scanning your apps…" else "Nothing here yet",
-                if (progress != null) "${progress.first} of ${progress.second}" else "Tap refresh to scan your apps.",
+                if (progress != null) stringResource(R.string.scanning_apps) else stringResource(R.string.empty_home_title),
+                if (progress != null) stringResource(R.string.of_fmt, progress.first, progress.second) else stringResource(R.string.empty_home_body),
             )
             return@TabScaffold
         }
@@ -168,7 +170,7 @@ fun HomeScreen(
                 if (present.isEmpty()) return@forEach
                 item(key = title) {
                     Column {
-                        SectionLabel(title)
+                        SectionLabel(stringResource(title))
                         Group {
                             present.forEach { cat ->
                                 val channels = byCategory.getValue(cat)
@@ -198,16 +200,16 @@ fun HomeScreen(
         AlertDialog(
             onDismissRequest = { confirm = null },
             icon = { CategoryIcon(cat) },
-            title = { Text("Block all ${cat.label.lowercase()}?") },
+            title = { Text(stringResource(R.string.block_all_fmt, stringResource(cat.labelRes).lowercase())) },
             text = {
-                Text("${cat.description} from $appCount ${if (appCount == 1) "app" else "apps"} will be hidden and kept in Logs. You can undo this.")
+                Text(pluralResource(R.plurals.block_confirm, appCount, stringResource(cat.descRes)))
             },
             confirmButton = {
                 TextButton(onClick = { setBlocked(cat, block = true); confirm = null }) {
-                    Text("Block", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.action_block), color = MaterialTheme.colorScheme.error)
                 }
             },
-            dismissButton = { TextButton(onClick = { confirm = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { confirm = null }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
 }
@@ -227,25 +229,25 @@ private fun TodayCard(history: List<HistoryEntry>, onClick: () -> Unit) {
         Column(Modifier.padding(start = 20.dp, end = 16.dp, top = 14.dp, bottom = 16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "TODAY",
+                    stringResource(R.string.label_today),
                     Modifier.weight(1f),
                     style = OvertypeLabel,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Icon(
                     Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    "Open Logs",
+                    stringResource(R.string.cd_open_logs),
                     Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Row(Modifier.padding(top = 12.dp)) {
-                Stat(today.size, "arrived", Modifier.weight(1f))
-                Stat(blocked, "kept out", Modifier.weight(1f))
+                Stat(today.size, stringResource(R.string.stat_arrived), Modifier.weight(1f))
+                Stat(blocked, stringResource(R.string.stat_kept_out), Modifier.weight(1f))
             }
             noisiest?.let { (app, count) ->
                 Text(
-                    "Noisiest · $app · $count",
+                    stringResource(R.string.noisiest_fmt, app, count),
                     Modifier.padding(top = 14.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -282,17 +284,17 @@ private fun CategoryRow(
     onClick: () -> Unit,
 ) {
     val appCount = channels.distinctBy { it.pkg }.size
-    val apps = "$appCount ${if (appCount == 1) "app" else "apps"}"
+    val apps = pluralResource(R.plurals.apps_count, appCount)
     // This week's counts, from Logs: "12 shown · 3 blocked". Omitted when there's no history yet.
-    val counts = stats?.let { " · ${it.shown} shown · ${it.blocked} blocked" }.orEmpty()
+    val counts = stats?.let { " · " + pluralResource(R.plurals.shown_count, it.shown) + " · " + pluralResource(R.plurals.blocked_count, it.blocked) }.orEmpty()
     ListItem(
-        headlineContent = { Text(cat.label) },
+        headlineContent = { Text(stringResource(cat.labelRes)) },
         supportingContent = {
             Text(
                 if (channels.allBlocked()) {
-                    "Off · $apps$counts"
+                    stringResource(R.string.label_off) + " · $apps$counts"
                 } else {
-                    "$apps · ${statusSummary(channels)}$counts" + policy?.let { " · new: ${policyLabel(it).lowercase()}" }.orEmpty()
+                    "$apps · ${statusSummary(channels)}$counts" + policy?.let { " · " + stringResource(R.string.new_fmt, policyLabel(it).lowercase()) }.orEmpty()
                 },
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -308,10 +310,10 @@ private fun CategoryRow(
 val policyOptions = listOf(null, ChannelAction.ALERT, ChannelAction.SILENT, ChannelAction.BLOCK)
 
 fun policyLabel(a: ChannelAction?) = when (a) {
-    null -> "Leave as is"
-    ChannelAction.ALERT -> "Allow"
-    ChannelAction.SILENT -> "Silence"
-    else -> "Block"
+    null -> R.string.policy_leave
+    ChannelAction.ALERT -> R.string.action_allow
+    ChannelAction.SILENT -> R.string.action_silence
+    else -> R.string.action_block
 }
 
 @Composable
@@ -324,6 +326,7 @@ fun CategoryScreen(
     vm: MainViewModel,
 ) {
     val channels = remember(apps, cat) { apps.flatMap { a -> a.channels.filter { it.category == cat } } }
+    val ctx = LocalContext.current
     val switches = rememberCategorySwitches { channels.allBlocked() }
     var filter by rememberSaveable { mutableStateOf<Status?>(null) }
     var selected by remember { mutableStateOf(emptySet<String>()) }
@@ -338,7 +341,7 @@ fun CategoryScreen(
     }
 
     DetailScaffold(
-        cat.label, nav::back,
+        stringResource(cat.labelRes), nav::back,
         bottomBar = {
             if (selected.isNotEmpty()) {
                 SelectionBar(selected.size, onClear = { selected = emptySet() }) { action ->
@@ -357,7 +360,7 @@ fun CategoryScreen(
                 ) {
                     CategoryIcon(cat, 56.dp)
                     Text(
-                        cat.description,
+                        stringResource(cat.descRes),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -366,8 +369,8 @@ fun CategoryScreen(
             item {
                 Group(Modifier.padding(vertical = 8.dp)) {
                     ListItem(
-                        headlineContent = { Text("Allow ${cat.label.lowercase()}") },
-                        supportingContent = { Text(if (!switches.isOn(cat)) "Off for every app" else statusSummary(channels)) },
+                        headlineContent = { Text(stringResource(R.string.allow_cat_fmt, stringResource(cat.labelRes).lowercase())) },
+                        supportingContent = { Text(if (!switches.isOn(cat)) stringResource(R.string.off_for_every_app) else statusSummary(channels)) },
                         trailingContent = {
                             Switch(
                                 checked = switches.isOn(cat),
@@ -380,17 +383,17 @@ fun CategoryScreen(
                         colors = clearListItem(),
                     )
                     ListItem(
-                        headlineContent = { Text("New channels") },
-                        supportingContent = { Text("When an app adds one in this category") },
-                        trailingContent = { PickerButton(policyLabel(policy), policyOptions, ::policyLabel) { vm.setPolicy(cat, it) } },
+                        headlineContent = { Text(stringResource(R.string.new_channels)) },
+                        supportingContent = { Text(stringResource(R.string.new_channels_when)) },
+                        trailingContent = { PickerButton(stringResource(policyLabel(policy)), policyOptions, { stringResource(policyLabel(it)) }) { vm.setPolicy(cat, it) } },
                         colors = clearListItem(),
                     )
                     ListItem(
-                        headlineContent = { Text("Quiet hours") },
+                        headlineContent = { Text(stringResource(R.string.quiet_hours)) },
                         supportingContent = {
                             Text(
-                                if (schedule == null) "Apply the block only at certain times"
-                                else "Blocking pauses outside ${scheduleSummary(schedule)}",
+                                if (schedule == null) stringResource(R.string.quiet_hours_body)
+                                else stringResource(R.string.blocking_pauses_fmt, scheduleSummary(LocalContext.current, schedule)),
                             )
                         },
                         trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
@@ -406,18 +409,18 @@ fun CategoryScreen(
                 ) {
                     (listOf<Status?>(null) + Status.entries).forEach { s ->
                         val count = channels.count { s == null || it.status() == s }
-                        QuietChip("${s?.label ?: "All"} $count", filter == s) { filter = s }
+                        QuietChip((s?.let { stringResource(it.labelRes) } ?: stringResource(R.string.label_all)) + " $count", filter == s) { filter = s }
                     }
                 }
             }
             if (visible.isEmpty()) {
-                item { Text("No channels match this filter.", Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                item { Text(stringResource(R.string.no_channels_match), Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onSurfaceVariant) }
             } else {
                 item {
                     SelectRow(
                         state = triState(visibleKeys, selected),
                         onClick = { toggle(visibleKeys) },
-                    ) { Text("Select all", style = MaterialTheme.typography.titleSmall) }
+                    ) { Text(stringResource(R.string.select_all), style = MaterialTheme.typography.titleSmall) }
                 }
             }
             visible.forEach { (pkg, list) ->
@@ -452,13 +455,19 @@ fun CategoryScreen(
     }
     if (editingSchedule) {
         ScheduleEditorSheet(
-            "${cat.label} quiet hours",
+            stringResource(R.string.quiet_hours_for_fmt, stringResource(cat.labelRes)),
             schedule,
             onDismiss = { editingSchedule = false },
             onSave = { s ->
                 vm.setSchedule(Schedule.keyFor(cat), s)
                 editingSchedule = false
-                vm.say(if (s == null) "Quiet hours off for ${cat.label}" else "Quiet hours for ${cat.label} · ${scheduleSummary(s)}")
+                vm.say(
+                    if (s == null) {
+                        ctx.getString(R.string.msg_qh_off_fmt, ctx.getString(cat.labelRes))
+                    } else {
+                        ctx.getString(R.string.msg_qh_on_fmt, ctx.getString(cat.labelRes), scheduleSummary(ctx, s))
+                    },
+                )
             },
         )
     }
@@ -508,17 +517,17 @@ private fun AppSelectRow(
         Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
             Text(list.first().appLabel, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(
-                if (list.size == 1) list.first().channel.name.toString() else "${list.size} channels",
+                if (list.size == 1) list.first().channel.name.toString() else pluralResource(R.plurals.channels_count, list.size),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        StatusText(status?.label ?: "Mixed", status)
+        StatusText(status?.let { stringResource(it.labelRes) } ?: stringResource(R.string.status_mixed), status)
         if (list.size > 1) {
             IconButton(onClick = onExpand) {
-                Icon(if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, if (expanded) "Collapse" else "Expand")
+                Icon(if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, if (expanded) stringResource(R.string.cd_collapse) else stringResource(R.string.cd_expand))
             }
         } else {
             Spacer(Modifier.width(48.dp))
@@ -533,16 +542,16 @@ private fun SelectionBar(count: Int, onClear: () -> Unit, onAction: (ChannelActi
         contentColor = MaterialTheme.colorScheme.onSurface,
         tonalElevation = 0.dp,
     ) {
-        IconButton(onClick = onClear) { Icon(Icons.Default.Close, "Clear selection") }
-        Text("$count selected", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
-        OutlinedButton(onClick = { onAction(ChannelAction.ALERT) }) { Text("Allow") }
+        IconButton(onClick = onClear) { Icon(Icons.Default.Close, stringResource(R.string.cd_clear_selection)) }
+        Text(pluralResource(R.plurals.selected_count, count), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+        OutlinedButton(onClick = { onAction(ChannelAction.ALERT) }) { Text(stringResource(R.string.action_allow)) }
         Spacer(Modifier.width(8.dp))
-        OutlinedButton(onClick = { onAction(ChannelAction.SILENT) }) { Text("Silence") }
+        OutlinedButton(onClick = { onAction(ChannelAction.SILENT) }) { Text(stringResource(R.string.action_silence)) }
         Spacer(Modifier.width(8.dp))
         Button(
             onClick = { onAction(ChannelAction.BLOCK) },
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError),
-        ) { Text("Block") }
+        ) { Text(stringResource(R.string.action_block)) }
         Spacer(Modifier.width(8.dp))
     }
 }

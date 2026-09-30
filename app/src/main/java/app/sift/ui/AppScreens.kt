@@ -36,8 +36,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.sift.R
 import app.sift.data.AppInfo
 import app.sift.data.Category
 import app.sift.data.ChannelAction
@@ -45,7 +47,14 @@ import app.sift.data.ChannelInfo
 import app.sift.data.HistoryEntry
 import app.sift.data.Outcome
 
-private enum class AppSort(val label: String) { NAME("A–Z"), MOST("Most notifications"), BLOCKED("Most blocked") }
+private enum class AppSort { NAME, MOST, BLOCKED }
+
+@Composable
+private fun AppSort.label(): String = when (this) {
+    NAME -> stringResource(R.string.sort_az)
+    MOST -> stringResource(R.string.sort_most)
+    BLOCKED -> stringResource(R.string.sort_most_blocked)
+}
 
 @Composable
 fun AppsScreen(
@@ -82,20 +91,20 @@ fun AppsScreen(
         Tab.APPS, onTab, progress) {
         Column {
             SearchField(
-                query, { query = it }, "Search ${shown.size} apps",
+                query, { query = it }, pluralResource(R.plurals.search_apps, shown.size),
                 Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             )
             Row(
                 Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                MenuChip(sort.label, sort != AppSort.NAME, AppSort.entries.map { it to it.label }) { sort = it }
-                QuietChip("Has blocked", onlyBlocked) { onlyBlocked = !onlyBlocked }
-                QuietChip("System apps", showSystem) { showSystem = !showSystem }
-                QuietChip("No channels", showEmpty) { showEmpty = !showEmpty }
+                MenuChip(sort.label(), sort != AppSort.NAME, AppSort.entries.map { it to it.label() }) { sort = it }
+                QuietChip(stringResource(R.string.chip_has_blocked), onlyBlocked) { onlyBlocked = !onlyBlocked }
+                QuietChip(stringResource(R.string.chip_system_apps), showSystem) { showSystem = !showSystem }
+                QuietChip(stringResource(R.string.chip_no_channels), showEmpty) { showEmpty = !showEmpty }
             }
             if (shown.isEmpty()) {
-                EmptyState("No apps", if (apps.isEmpty()) "Apps appear here after a scan." else "Try another search or filter.")
+                EmptyState(stringResource(R.string.empty_no_apps_title), if (apps.isEmpty()) stringResource(R.string.empty_no_apps_body) else stringResource(R.string.empty_no_apps_search))
                 return@Column
             }
             LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
@@ -124,26 +133,27 @@ private fun WeekCount(count: Int, blocked: Int) {
     Column(horizontalAlignment = Alignment.End) {
         Text(count.toString(), style = MaterialTheme.typography.titleMedium.merge(TabularFigures))
         Text(
-            if (blocked > 0) "$blocked blocked" else "this week",
+            if (blocked > 0) pluralResource(R.plurals.blocked_count, blocked) else stringResource(R.string.label_this_week),
             style = MaterialTheme.typography.labelSmall,
             color = if (blocked > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
 
+@Composable
 private fun appSummary(a: AppInfo): String = when {
-    a.error != null -> "Couldn't read channels"
-    a.channels.isEmpty() -> "No channels yet"
-    else -> "${a.channels.size} ${if (a.channels.size == 1) "channel" else "channels"} · ${statusSummary(a.channels)}"
+    a.error != null -> stringResource(R.string.err_read_channels)
+    a.channels.isEmpty() -> stringResource(R.string.no_channels_yet)
+    else -> pluralResource(R.plurals.channels_count, a.channels.size) + " · " + statusSummary(a.channels)
 }
 
 @Composable
 fun AppDetailScreen(app: AppInfo?, appDefault: ChannelAction?, nav: Nav, vm: MainViewModel) {
     var sheetKey by rememberSaveable { mutableStateOf<String?>(null) }
 
-    DetailScaffold(app?.label ?: "App", nav::back) {
+    DetailScaffold(app?.label ?: stringResource(R.string.label_app), nav::back) {
         if (app == null) {
-            EmptyState("App not found", "It may have been uninstalled. Try rescanning.")
+            EmptyState(stringResource(R.string.app_not_found), stringResource(R.string.app_not_found_body))
             return@DetailScaffold
         }
         val sections = remember(app) { app.channels.groupBy { it.category }.toSortedMap() }
@@ -173,17 +183,17 @@ fun AppDetailScreen(app: AppInfo?, appDefault: ChannelAction?, nav: Nav, vm: Mai
             if (app.channels.isNotEmpty()) {
                 item {
                     Row(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        BulkButton("Allow all") { vm.bulk(app.channels, ChannelAction.ALERT, app.label) }
-                        BulkButton("Silence all") { vm.bulk(app.channels, ChannelAction.SILENT, app.label) }
-                        BulkButton("Block all", danger = true) { vm.bulk(app.channels, ChannelAction.BLOCK, app.label) }
+                        BulkButton(stringResource(R.string.allow_all)) { vm.bulk(app.channels, ChannelAction.ALERT, app.label) }
+                        BulkButton(stringResource(R.string.silence_all)) { vm.bulk(app.channels, ChannelAction.SILENT, app.label) }
+                        BulkButton(stringResource(R.string.block_all), danger = true) { vm.bulk(app.channels, ChannelAction.BLOCK, app.label) }
                     }
                 }
                 item {
                     ListItem(
-                        headlineContent = { Text("New channels") },
-                        supportingContent = { Text("Apply the same action to every channel of this app, now and later") },
+                        headlineContent = { Text(stringResource(R.string.new_channels)) },
+                        supportingContent = { Text(stringResource(R.string.new_channels_body)) },
                         trailingContent = {
-                            PickerButton(appDefaultLabel(appDefault), appDefaultOptions, ::appDefaultLabel) {
+                            PickerButton(stringResource(appDefaultLabel(appDefault)), appDefaultOptions, { stringResource(appDefaultLabel(it)) }) {
                                 vm.setAppDefault(app.pkg, app.label, it, app.channels)
                             }
                         },
@@ -191,9 +201,9 @@ fun AppDetailScreen(app: AppInfo?, appDefault: ChannelAction?, nav: Nav, vm: Mai
                     )
                 }
             }
-            app.error?.let { item { Text("Couldn't read channels: $it", Modifier.padding(16.dp), color = MaterialTheme.colorScheme.error) } }
+            app.error?.let { item { Text(stringResource(R.string.err_read_channels_fmt, it), Modifier.padding(16.dp), color = MaterialTheme.colorScheme.error) } }
             if (app.channels.isEmpty() && app.error == null) {
-                item { EmptyState("No channels yet", "Apps create channels the first time they need to notify you.") }
+                item { EmptyState(stringResource(R.string.no_channels_yet), stringResource(R.string.no_channels_body)) }
             }
             sections.forEach { (cat, channels) ->
                 item(key = "section-${cat.name}") { SectionLabel(cat.label) }
@@ -244,24 +254,24 @@ private fun ChannelSheet(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            SectionLabel("Behaviour")
+            SectionLabel(stringResource(R.string.section_behaviour))
             ChannelAction.entries.forEach { a ->
                 val current = c.isCurrent(a)
                 ListItem(
-                    headlineContent = { Text(a.label) },
-                    supportingContent = { Text(a.description) },
+                    headlineContent = { Text(stringResource(a.labelRes)) },
+                    supportingContent = { Text(stringResource(a.descRes)) },
                     leadingContent = { RadioButton(selected = current, onClick = null) },
                     colors = clearListItem(),
                     modifier = Modifier.clickable { onAction(a) },
                 )
             }
-            SectionLabel("Category")
+            SectionLabel(stringResource(R.string.section_category))
             ListItem(
-                headlineContent = { Text(c.category.label) },
-                supportingContent = { Text(if (c.overridden) "Set by you" else "Detected automatically · ${c.confidence}% match") },
+                headlineContent = { Text(stringResource(c.category.labelRes)) },
+                supportingContent = { Text(if (c.overridden) stringResource(R.string.override_set_by_you) else stringResource(R.string.detected_auto_fmt, c.confidence)) },
                 leadingContent = { CategoryIcon(c.category) },
                 trailingContent = {
-                    PickerButton("Change", listOf<Category?>(null) + Category.entries, { it?.let { cat -> cat.label } ?: "Automatic" }, onCategory)
+                    PickerButton(stringResource(R.string.change), listOf<Category?>(null) + Category.entries, { it?.let { cat -> stringResource(cat.labelRes) } ?: stringResource(R.string.automatic) }, onCategory)
                 },
                 colors = clearListItem(),
             )
@@ -272,10 +282,10 @@ private fun ChannelSheet(
 private val appDefaultOptions = listOf<ChannelAction?>(null, ChannelAction.ALERT, ChannelAction.SILENT, ChannelAction.BLOCK)
 
 private fun appDefaultLabel(a: ChannelAction?) = when (a) {
-    null -> "No default"
-    ChannelAction.ALERT -> "Allow"
-    ChannelAction.SILENT -> "Silence"
-    else -> "Block"
+    null -> R.string.appdefault_none
+    ChannelAction.ALERT -> R.string.action_allow
+    ChannelAction.SILENT -> R.string.action_silence
+    else -> R.string.action_block
 }
 
 /** Low-emphasis bulk action; only the destructive one takes colour. */

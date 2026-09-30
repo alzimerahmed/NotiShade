@@ -7,6 +7,7 @@ import android.service.quicksettings.TileService
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import app.sift.App
+import app.sift.R
 import app.sift.data.BackupCodec
 import app.sift.data.Batch
 import app.sift.data.Category
@@ -49,7 +50,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun scan() = launch { say("Scanned ${app.repo.scanAll()} apps") }
+    fun scan() = launch {
+        val count = app.repo.scanAll()
+        say(app.resources.getQuantityString(R.plurals.msg_scanned, count, count))
+    }
 
     fun scanOnce() {
         if (!scanned) {
@@ -63,14 +67,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /** Bulk action; "Allow" leaves already-allowed channels alone so pop-up channels aren't downgraded. */
     fun bulk(targets: List<ChannelInfo>, action: ChannelAction, title: String) = launch {
         val list = if (action == ChannelAction.ALERT) targets.filter { it.status() != Status.ALLOWED } else targets
-        if (list.isEmpty()) return@launch say("Already allowed")
+        if (list.isEmpty()) return@launch say(app.getString(R.string.msg_already_allowed))
         val outcome = app.engine.apply("${action.verb}: $title", list, action)
-        message.value = UiMessage(outcome.describe(action.verb), outcome.batch)
+        message.value = UiMessage(outcome.describe(app, action.verb), outcome.batch)
     }
 
     fun setChannel(c: ChannelInfo, action: ChannelAction) = launch {
         val outcome = app.engine.apply("${action.verb}: ${c.appLabel} · ${c.channel.name}", listOf(c), action)
-        message.value = UiMessage(outcome.describe(action.verb), outcome.batch)
+        message.value = UiMessage(outcome.describe(app, action.verb), outcome.batch)
     }
 
     /** Blocks (or re-allows) a whole category, including channels apps add to it later. */
@@ -84,7 +88,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         if (targets.isEmpty()) return@launch
         val outcome = app.engine.apply("${action.verb}: ${cat.label}", targets, action)
-        message.value = UiMessage("${cat.label} · ${outcome.describe(action.verb)}", outcome.batch) { setPolicy(cat, previous) }
+        message.value = UiMessage("${cat.label} · ${outcome.describe(app, action.verb)}", outcome.batch) { setPolicy(cat, previous) }
     }
 
     fun setPolicy(cat: Category, action: ChannelAction?) = app.store.update {
@@ -109,14 +113,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         app.store.update {
             it.copy(appDefaults = if (action == null) it.appDefaults - pkg else it.appDefaults + (pkg to action))
         }
-        if (action == null) return@launch say("New channels of $label will keep their own settings")
+        if (action == null) return@launch say(app.getString(R.string.msg_appdefault_keep, label))
         val targets = if (action == ChannelAction.ALERT) channels.filter { it.status() != Status.ALLOWED } else channels
-        if (targets.isEmpty()) return@launch say("New channels of $label will be ${action.label.lowercase()}")
+        if (targets.isEmpty()) return@launch say(app.getString(R.string.msg_appdefault_willbe, label, action.label.lowercase()))
         val outcome = app.engine.apply("${action.verb}: $label · all channels", targets, action)
-        message.value = UiMessage("All channels · ${outcome.describe(action.verb)}", outcome.batch)
+        message.value = UiMessage(app.getString(R.string.all_channels) + " · " + outcome.describe(app, action.verb), outcome.batch)
     }
 
-    fun undo(batch: Batch) = launch { say("Undone · " + app.engine.undo(batch).describe("Restored")) }
+    fun undo(batch: Batch) = launch { say(app.getString(R.string.undone) + " · " + app.engine.undo(batch).describe(app, app.getString(R.string.verb_restored))) }
 
     val history = app.history.entries
 
@@ -131,7 +135,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun channelFor(e: HistoryEntry) = apps.value.firstOrNull { it.pkg == e.pkg }?.channels?.firstOrNull { it.channel.id == e.channelId }
 
     fun setChannelFromLog(e: HistoryEntry, action: ChannelAction) {
-        val c = channelFor(e) ?: return say("That category isn't available anymore")
+        val c = channelFor(e) ?: return say(app.getString(R.string.err_category_unavailable))
         setChannel(c, action)
     }
 
@@ -166,22 +170,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun setPaused(on: Boolean) {
         app.store.update { it.copy(paused = on) }
         TileService.requestListeningState(getApplication(), ComponentName(getApplication(), PauseTileService::class.java))
-        say(if (on) "Blocking paused — notifications show as usual" else "Blocking resumed")
+        say(if (on) app.getString(R.string.msg_paused_on) else app.getString(R.string.msg_paused_off))
     }
 
     fun exportTo(uri: Uri) = launch {
-        val out = getApplication<App>().contentResolver.openOutputStream(uri) ?: error("Couldn't open the file")
+        val out = getApplication<App>().contentResolver.openOutputStream(uri) ?: error(app.getString(R.string.err_open_file))
         out.use { it.write(BackupCodec.encode(app.store.data.value).encodeToByteArray()) }
-        say("Settings exported")
+        say(app.getString(R.string.msg_settings_exported))
     }
 
     /** History export; the format is chosen by the caller (CSV or JSON). */
-    fun exportHistoryCsvTo(uri: Uri) = exportHistoryTo(uri, HistoryCodec::encodeCsv, "History exported as CSV")
+    fun exportHistoryCsvTo(uri: Uri) = exportHistoryTo(uri, HistoryCodec::encodeCsv, app.getString(R.string.msg_history_exported_csv))
 
-    fun exportHistoryJsonTo(uri: Uri) = exportHistoryTo(uri, HistoryCodec::encodeJson, "History exported as JSON")
+    fun exportHistoryJsonTo(uri: Uri) = exportHistoryTo(uri, HistoryCodec::encodeJson, app.getString(R.string.msg_history_exported_json))
 
     private fun exportHistoryTo(uri: Uri, encode: (List<HistoryEntry>) -> String, done: String) = launch {
-        val out = getApplication<App>().contentResolver.openOutputStream(uri) ?: error("Couldn't open the file")
+        val out = getApplication<App>().contentResolver.openOutputStream(uri) ?: error(app.getString(R.string.err_open_file))
         out.use { it.write(encode(app.history.entries.value).encodeToByteArray()) }
         say(done)
     }
@@ -189,13 +193,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun importFrom(uri: Uri) = launch {
         val text = getApplication<App>().contentResolver.openInputStream(uri)?.use {
             val bytes = it.readNBytes(MAX_BACKUP_BYTES + 1)
-            if (bytes.size > MAX_BACKUP_BYTES) error("File is too large")
+            if (bytes.size > MAX_BACKUP_BYTES) error(app.getString(R.string.err_file_too_large))
             bytes.decodeToString()
-        } ?: error("Couldn't read the file")
-        val imported = BackupCodec.decode(text) ?: error("Not a Sift settings file")
+        } ?: error(app.getString(R.string.err_read_file))
+        val imported = BackupCodec.decode(text) ?: error(app.getString(R.string.err_not_sift_file))
         app.store.update { imported }
         // Settings alone aren't enough: re-apply the imported policies to the actual channels.
-        say("Applying imported settings…")
+        say(app.getString(R.string.msg_applying_import))
         app.repo.scanAll()
         val apps = app.repo.apps.value
         imported.policies.forEach { (cat, action) ->
@@ -210,7 +214,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val targets = apps.firstOrNull { it.pkg == pkg }?.channels.orEmpty().filter { !alreadyAllowed(it, action) }
             if (targets.isNotEmpty()) app.engine.apply("Restored: ${action.verb.lowercase()} ${targets.firstOrNull()?.appLabel ?: pkg}", targets, action)
         }
-        say("Settings imported")
+        say(app.getString(R.string.msg_settings_imported))
     }
 
     /** "Allow" must not downgrade channels the user set to pop up; the rest are enforced as-is. */

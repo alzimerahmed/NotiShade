@@ -48,9 +48,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.sift.R
 import app.sift.backend.AccessState
 import app.sift.data.AppInfo
 import app.sift.data.HistoryEntry
@@ -60,9 +62,9 @@ import app.sift.data.RuleAction
 import app.sift.data.Schedule
 
 private val ruleIdeas = listOf(
-    "Sales & offers" to listOf("sale", "% off", "discount", "deal"),
-    "Cashback & rewards" to listOf("cashback", "reward", "coupon", "voucher"),
-    "Limited time" to listOf("limited time", "hurry", "last chance", "ends tonight"),
+    R.string.idea_sales to listOf("sale", "% off", "discount", "deal"),
+    R.string.idea_cashback to listOf("cashback", "reward", "coupon", "voucher"),
+    R.string.idea_limited to listOf("limited time", "hurry", "last chance", "ends tonight"),
 )
 
 private fun newRule(name: String = "", keywords: List<String> = emptyList(), pkg: String? = null) =
@@ -96,7 +98,7 @@ fun RulesScreen(
                 ExtendedFloatingActionButton(
                     onClick = { editing = newRule() },
                     icon = { Icon(Icons.Default.Add, null) },
-                    text = { Text("New rule") },
+                    text = { Text(stringResource(R.string.new_rule)) },
                 )
             }
         },
@@ -112,12 +114,12 @@ fun RulesScreen(
                     ) {
                         Column(Modifier.padding(start = 20.dp, end = 12.dp, top = 14.dp, bottom = 6.dp)) {
                             Text(
-                                "Rules are paused",
+                                stringResource(R.string.rules_paused),
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.error,
                             )
                             Text(
-                                "They need notification access to see incoming notifications.",
+                                stringResource(R.string.rules_paused_body),
                                 Modifier.padding(top = 2.dp),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -125,7 +127,7 @@ fun RulesScreen(
                             TextButton(
                                 onClick = { nav.push("setup") },
                                 contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp),
-                            ) { Text("Set up access") }
+                            ) { Text(stringResource(R.string.setup_access)) }
                         }
                     }
                 }
@@ -135,7 +137,7 @@ fun RulesScreen(
             } else {
                 item {
                     Text(
-                        "Rules catch single notifications by their text, from any channel. Matches may show for a moment before they're removed, and are listed in Logs.",
+                        stringResource(R.string.rules_intro),
                         Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -173,20 +175,20 @@ fun RulesScreen(
 @Composable
 private fun RulesEmpty(onCreate: (String, List<String>) -> Unit) {
     EmptyState(
-        "No rules yet",
-        "Some apps send promotions through the same channel as useful updates. A rule removes just the notifications that mention words you choose.",
+        stringResource(R.string.empty_no_rules),
+        stringResource(R.string.empty_no_rules_body),
         icon = Icons.Default.FilterAlt,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Button(onClick = { onCreate("", emptyList()) }, Modifier.padding(top = 8.dp)) {
                 Icon(Icons.Default.Add, null, Modifier.size(18.dp))
                 Spacer(Modifier.size(8.dp))
-                Text("Create a rule")
+                Text(stringResource(R.string.create_rule))
             }
-            Text("Or start from an idea", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.or_start_from_idea), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
                 ruleIdeas.forEach { (name, words) ->
-                    SuggestionChip(onClick = { onCreate(name, words) }, label = { Text(name) })
+                    SuggestionChip(onClick = { onCreate(stringResource(name), words) }, label = { Text(stringResource(name)) })
                 }
             }
         }
@@ -219,9 +221,9 @@ private fun RuleCard(r: Rule, appLabel: String?, caught: Int, onToggle: () -> Un
                     }
                     Text(
                         listOfNotNull(
-                            appLabel ?: "All apps",
-                            r.action.label,
-                            caught.takeIf { it > 0 }?.let { "caught $it this week" },
+                            appLabel ?: stringResource(R.string.all_apps),
+                            stringResource(r.action.labelRes),
+                            caught.takeIf { it > 0 }?.let { stringResource(R.string.caught_fmt, it) },
                         ).joinToString(" \u00b7 "),
                         Modifier.padding(start = 8.dp),
                         style = MaterialTheme.typography.bodySmall,
@@ -278,9 +280,9 @@ fun RuleEditorSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 24.dp)) {
-            Text(if (isNew) "New rule" else "Edit rule", style = MaterialTheme.typography.headlineSmall)
+            Text(if (isNew) stringResource(R.string.new_rule) else stringResource(R.string.edit_rule), style = MaterialTheme.typography.headlineSmall)
 
-            FieldLabel("When a notification mentions")
+            FieldLabel(stringResource(R.string.field_when_mentions))
             if (keywords.isNotEmpty()) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     keywords.forEach { k ->
@@ -288,7 +290,7 @@ fun RuleEditorSheet(
                             selected = false,
                             onClick = { keywords = keywords - k },
                             label = { Text(k) },
-                            trailingIcon = { Icon(Icons.Default.Close, "Remove $k", Modifier.size(16.dp)) },
+                            trailingIcon = { Icon(Icons.Default.Close, stringResource(R.string.cd_remove_keyword, k), Modifier.size(16.dp)) },
                         )
                     }
                 }
@@ -297,61 +299,61 @@ fun RuleEditorSheet(
                 value = input,
                 onValueChange = { if (it.endsWith(',')) add(splitKeywords(it)) else input = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(if (keywords.isEmpty()) "A word or phrase, e.g. cashback" else "Add another") },
+                placeholder = { Text(if (keywords.isEmpty()) stringResource(R.string.keyword_placeholder) else stringResource(R.string.keyword_add_placeholder)) },
                 trailingIcon = {
-                    if (input.isNotBlank()) IconButton(onClick = { add(splitKeywords(input)) }) { Icon(Icons.Default.Add, "Add") }
+                    if (input.isNotBlank()) IconButton(onClick = { add(splitKeywords(input)) }) { Icon(Icons.Default.Add, stringResource(R.string.cd_add)) }
                 },
-                supportingText = { Text("Any of these, upper or lower case") },
+                supportingText = { Text(stringResource(R.string.keyword_hint)) },
                 singleLine = true,
                 shape = RoundedCornerShape(16.dp),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { add(splitKeywords(input)) }),
             )
 
-            FieldLabel("From")
+            FieldLabel(stringResource(R.string.field_from))
             MenuChip(
-                label = pkg?.let { p -> apps.firstOrNull { it.pkg == p }?.label ?: history.firstOrNull { it.pkg == p }?.app ?: p } ?: "All apps",
+                label = pkg?.let { p -> apps.firstOrNull { it.pkg == p }?.label ?: history.firstOrNull { it.pkg == p }?.app ?: p } ?: stringResource(R.string.all_apps),
                 selected = pkg != null,
-                options = listOf<Pair<String?, String>>(null to "All apps") + appChoices.map { it.pkg to it.label },
+                options = listOf<Pair<String?, String>>(null to stringResource(R.string.all_apps)) + appChoices.map { it.pkg to it.label },
                 onPick = { pkg = it },
             )
 
-            FieldLabel("Then")
+            FieldLabel(stringResource(R.string.field_then))
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 RuleAction.entries.forEachIndexed { i, a ->
                     SegmentedButton(
                         selected = action == a,
                         onClick = { action = a },
                         shape = SegmentedButtonDefaults.itemShape(i, RuleAction.entries.size),
-                    ) { Text(a.label) }
+                    ) { Text(stringResource(a.labelRes)) }
                 }
             }
             Text(
-                action.description,
+                stringResource(action.descRes),
                 Modifier.padding(top = 6.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
-            FieldLabel("Name")
+            FieldLabel(stringResource(R.string.field_name))
             OutlinedTextField(
                 name, { name = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(allKeywords.firstOrNull() ?: "Optional") },
+                placeholder = { Text(allKeywords.firstOrNull() ?: stringResource(R.string.label_optional)) },
                 singleLine = true,
                 shape = RoundedCornerShape(16.dp),
             )
 
             if (allKeywords.isNotEmpty()) MatchPreview(matches)
 
-            FieldLabel("Quiet hours")
+            FieldLabel(stringResource(R.string.field_quiet_hours))
             ScheduleEditor(schedule, onSaveSchedule)
 
             Row(Modifier.fillMaxWidth().padding(top = 20.dp), verticalAlignment = Alignment.CenterVertically) {
-                onDelete?.let { TextButton(onClick = it) { Text("Delete", color = MaterialTheme.colorScheme.error) } }
+                onDelete?.let { TextButton(onClick = it) { Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error) } }
                 Spacer(Modifier.weight(1f))
-                TextButton(onClick = onDismiss) { Text("Cancel") }
-                Button(enabled = allKeywords.isNotEmpty(), onClick = { onSave(draft) }) { Text("Save") }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+                Button(enabled = allKeywords.isNotEmpty(), onClick = { onSave(draft) }) { Text(stringResource(R.string.action_save)) }
             }
         }
     }
@@ -368,9 +370,8 @@ private fun MatchPreview(matches: List<HistoryEntry>) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
                 when (matches.size) {
-                    0 -> "Nothing in Logs matches yet"
-                    1 -> "Would have caught 1 notification in Logs"
-                    else -> "Would have caught ${matches.size} notifications in Logs"
+                    0 -> stringResource(R.string.match_none)
+                    else -> pluralResource(R.plurals.would_catch, matches.size)
                 },
                 style = MaterialTheme.typography.titleSmall,
             )

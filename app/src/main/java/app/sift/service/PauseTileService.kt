@@ -3,6 +3,7 @@ package app.sift.service
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import app.sift.App
+import app.sift.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -47,7 +48,7 @@ class PauseTileService : TileService() {
         val tile = qsTile ?: return
         runCatching {
             tile.state = if (paused) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-            tile.subtitle = if (paused) "Blocking paused" else "Blocking active"
+            tile.subtitle = getString(if (paused) R.string.tile_paused else R.string.tile_active)
             tile.updateTile()
         }
     }

@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sift</string>
+
+    <string name="tab_categories">Categorías</string>
+    <string name="tab_apps">Apps</string>
+    <string name="tab_logs">Registro</string>
+    <string name="tab_rules">Reglas</string>
+    <string name="tab_settings">Ajustes</string>
+
+    <string name="action_undo">Deshacer</string>
+    <string name="action_allow">Permitir</string>
+    <string name="action_silence">Silenciar</string>
+    <string name="action_block">Bloquear</string>
+    <string name="action_pair">Vincular</string>
+    <string name="action_set">Fijar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_import">Importar</string>
+    <string name="action_continue">Continuar</string>
+    <string name="action_back">Atrás</string>
+    <string name="label_all">Todas</string>
+    <string name="label_off">Desactivado</string>
+    <string name="label_current">Actual</string>
+    <string name="label_optional">Opcional</string>
+    <string name="label_app">App</string>
+    <string name="label_this_week">esta semana</string>
+    <string name="label_days">DÍAS</string>
+    <string name="label_today">HOY</string>
+    <string name="label_good_to_know">CONVIENE SABER</string>
+    <string name="cd_back">Atrás</string>
+    <string name="cd_clear">Borrar</string>
+
+    <string name="status_allowed">Permitidas</string>
+    <string name="status_silent">Silenciosas</string>
+    <string name="status_blocked">Bloqueadas</string>
+    <string name="status_mixed">Mixto</string>
+    <string name="status_blocked_not_logged">Bloqueadas · sin registro</string>
+    <string name="imp_minimized">Minimizadas</string>
+    <string name="imp_alerting">Con alerta</string>
+    <string name="imp_popup">Emergentes</string>
+    <string name="imp_unspecified">Sin especificar</string>
+    <string name="all_allowed">Todas permitidas</string>
+
+    <string name="action_popup">Emergente</string>
+    <string name="action_alert">Alerta</string>
+    <string name="action_silent">Silenciosa</string>
+    <string name="action_minimized">Minimizada</string>
+    <string name="action_blocked">Bloqueada</string>
+    <string name="desc_popup">Suena y aparece en pantalla</string>
+    <string name="desc_alert">Sonido o vibración</string>
+    <string name="desc_silent">En el panel, sin sonido</string>
+    <string name="desc_minimized">Plegada al fondo del panel</string>
+    <string name="desc_blocked">Nunca se muestra, se guarda en el registro</string>
+
+    <string name="rule_action_remove">Eliminar</string>
+    <string name="rule_action_snooze">Posponer 1 hora</string>
+    <string name="rule_desc_remove">Se elimina al llegar, se guarda en el registro</string>
+    <string name="rule_desc_snooze">Oculta durante una hora y vuelve a aparecer</string>
+
+    <string name="theme_system">Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+
+    <string name="cat_promo">Promociones</string>
+    <string name="cat_recommendations">Recomendaciones</string>
+    <string name="cat_news">Noticias y contenido</string>
+    <string name="cat_social">Actividad social</string>
+    <string name="cat_messages">Mensajes</string>
+    <string name="cat_calls">Llamadas</string>
+    <string name="cat_orders">Pedidos y envíos</string>
+    <string name="cat_payments">Pagos</string>
+    <string name="cat_security">Seguridad</string>
+    <string name="cat_reminders">Recordatorios</string>
+    <string name="cat_media">Multimedia y servicios</string>
+    <string name="cat_system">Actualizaciones y sistema</string>
+    <string name="cat_other">Otras</string>
+    <string name="cat_promo_desc">Ofertas, descuentos, cupones y avisos de marketing</string>
+    <string name="cat_recommendations_desc">Sugerencias, tendencias y selecciones «para ti»</string>
+    <string name="cat_news_desc">Titulares, publicaciones nuevas, episodios y novedades en directo</string>
+    <string name="cat_social_desc">Me gusta, comentarios, seguidores y menciones</string>
+    <string name="cat_messages_desc">Chats, mensajes directos y correo</string>
+    <string name="cat_calls_desc">Llamadas entrantes, perdidas y buzón de voz</string>
+    <string name="cat_orders_desc">Estado de pedidos, envíos, viajes y reservas</string>
+    <string name="cat_payments_desc">Transacciones, facturas y avisos de banca y monedero</string>
+    <string name="cat_security_desc">Códigos OTP, inicios de sesión y avisos de cuenta</string>
+    <string name="cat_reminders_desc">Alarmas, temporizadores, calendario y tareas</string>
+    <string name="cat_media_desc">Reproducción, navegación y servicios en ejecución</string>
+    <string name="cat_system_desc">Descargas, sincronización, copias de seguridad y errores</string>
+    <string name="cat_other_desc">Canales que no coincidieron con ninguna categoría</string>
+
+    <string name="group_often_noise">Suele ser ruido</string>
+    <string name="group_usually_important">Suele ser importante</string>
+    <string name="group_everything_else">Todo lo demás</string>
+
+    <string name="sort_az">A–Z</string>
+    <string name="sort_most">Más notificaciones</string>
+    <string name="sort_most_blocked">Más bloqueadas</string>
+    <string name="chip_has_blocked">Con bloqueadas</string>
+    <string name="chip_system_apps">Apps del sistema</string>
+    <string name="chip_no_channels">Sin canales</string>
+    <string name="empty_no_apps_title">No hay apps</string>
+    <string name="empty_no_apps_body">Las apps aparecen aquí tras un escaneo.</string>
+    <string name="empty_no_apps_search">Prueba otra búsqueda o filtro.</string>
+    <string name="err_read_channels">No se pudieron leer los canales</string>
+    <string name="err_read_channels_fmt">No se pudieron leer los canales: %1$s</string>
+    <string name="no_channels_yet">Aún no hay canales</string>
+    <string name="no_channels_body">Las apps crean canales la primera vez que necesitan notificarte.</string>
+    <string name="app_not_found">App no encontrada</string>
+    <string name="app_not_found_body">Puede que se haya desinstalado. Prueba a reescanear.</string>
+    <string name="allow_all">Permitir todas</string>
+    <string name="allow_cat_fmt">Permitir %1$s</string>
+    <string name="silence_all">Silenciar todas</string>
+    <string name="block_all">Bloquear todas</string>
+    <string name="new_channels">Canales nuevos</string>
+    <string name="new_channels_body">Aplica la misma acción a todos los canales de esta app, ahora y en el futuro</string>
+    <string name="appdefault_none">Sin acción por omisión</string>
+    <string name="policy_leave">Dejar como está</string>
+    <string name="section_behaviour">Comportamiento</string>
+    <string name="section_category">Categoría</string>
+    <string name="override_set_by_you">Elegido por ti</string>
+    <string name="detected_auto_fmt">Detectado automáticamente · %1$d%% de coincidencia</string>
+    <string name="change">Cambiar</string>
+    <string name="automatic">Automático</string>
+
+    <string name="filter_all">Todas</string>
+    <string name="filter_shown">Mostradas</string>
+    <string name="filter_blocked">Bloqueadas</string>
+    <string name="removed_by_rule_fmt">Eliminada por la regla «%1$s»</string>
+    <string name="cd_export_history">Exportar el historial</string>
+    <string name="export_csv">Exportar como CSV</string>
+    <string name="export_json">Exportar como JSON</string>
+    <string name="cd_clear_history">Borrar el historial</string>
+    <string name="empty_no_notifications">Aún no hay notificaciones</string>
+    <string name="empty_logs_body">Cada notificación que llegue a partir de ahora se listará aquí durante 7 días, incluidas las que esta app bloquee.</string>
+    <string name="logs_need_access">El historial necesita acceso a las notificaciones.</string>
+    <string name="setup_access">Configurar el acceso</string>
+    <string name="search_logs">Buscar por título, texto o app</string>
+    <string name="empty_no_matches">Sin coincidencias</string>
+    <string name="no_matches_body">Prueba otros filtros u otra búsqueda.</string>
+    <string name="all_apps">Todas las apps</string>
+    <string name="all_categories">Todas las categorías</string>
+    <string name="app_option_fmt">%1$s (%2$d)</string>
+    <string name="category_option_fmt">%1$s (%2$d)</string>
+    <string name="day_blocked_fmt"> · %1$d bloqueadas</string>
+    <string name="today">Hoy</string>
+    <string name="yesterday">Ayer</string>
+    <string name="cd_blocked">Bloqueada</string>
+    <string name="pill_shown">Mostrada</string>
+    <string name="pill_rule">Regla</string>
+    <string name="all_channel_notifs_fmt">Todas las notificaciones de «%1$s»</string>
+    <string name="err_channel_unavailable">Este canal ya no está disponible</string>
+    <string name="sheet_only_like">Solo notificaciones como esta</string>
+    <string name="rule_hint_empty">Crea una regla para eliminar las notificaciones que mencionen las palabras que elijas.</string>
+    <string name="rule_hint_candidates">Toca las palabras que la delatan y crea una regla. Las detecta en cualquier canal.</string>
+    <string name="create_rule">Crear regla</string>
+    <string name="more_from_fmt">Más de %1$s</string>
+    <string name="app_settings">Ajustes de la app</string>
+    <string name="cd_delete_entry">Eliminar del registro</string>
+    <string name="clear_history_title">¿Borrar el historial?</string>
+    <string name="clear_history_body">Elimina las %1$d notificaciones guardadas. Tus ajustes no se ven afectados.</string>
+    <string name="rule_created_fmt">Regla «%1$s» creada</string>
+
+    <string name="new_rule">Nueva regla</string>
+    <string name="edit_rule">Editar regla</string>
+    <string name="rules_paused">Reglas en pausa</string>
+    <string name="rules_paused_body">Necesitan acceso a las notificaciones para ver las que llegan.</string>
+    <string name="rules_intro">Las reglas detectan notificaciones concretas por su texto, en cualquier canal. Puede que una coincidencia se muestre un instante antes de eliminarse, y queda anotada en el registro.</string>
+    <string name="empty_no_rules">Aún no hay reglas</string>
+    <string name="empty_no_rules_body">Algunas apps envían promociones por el mismo canal que las novedades útiles. Una regla elimina solo las notificaciones que mencionen las palabras que elijas.</string>
+    <string name="or_start_from_idea">O empieza con una idea</string>
+    <string name="idea_sales">Ofertas y promociones</string>
+    <string name="idea_cashback">Reembolsos y recompensas</string>
+    <string name="idea_limited">Tiempo limitado</string>
+    <string name="caught_fmt">capturó %1$d esta semana</string>
+    <string name="field_when_mentions">Cuando una notificación mencione</string>
+    <string name="field_from">De</string>
+    <string name="field_then">Entonces</string>
+    <string name="field_name">Nombre</string>
+    <string name="field_quiet_hours">Horas de silencio</string>
+    <string name="cd_remove_keyword">Quitar %1$s</string>
+    <string name="keyword_placeholder">Una palabra o frase, p. ej. reembolso</string>
+    <string name="keyword_add_placeholder">Añadir otra</string>
+    <string name="cd_add">Añadir</string>
+    <string name="keyword_hint">Cualquiera de ellas, en mayúsculas o minúsculas</string>
+    <string name="match_none">Nada del registro coincide todavía</string>
+    <string name="cd_expand">Desplegar</string>
+    <string name="cd_collapse">Plegar</string>
+
+    <string name="section_access">Acceso</string>
+    <string name="section_blocking">Bloqueo</string>
+    <string name="section_data">Datos</string>
+    <string name="section_backup">Copia de seguridad</string>
+    <string name="section_appearance">Apariencia</string>
+    <string name="section_about">Acerca de</string>
+    <string name="connected">Conectado</string>
+    <string name="not_connected">Sin conexión</string>
+    <string name="access_body">Acceso a notificaciones y emparejamiento de dispositivo</string>
+    <string name="paused">En pausa</string>
+    <string name="active">Activo</string>
+    <string name="pause_body">Pausa todo el bloqueo y las reglas; también disponible como mosaico de ajustes rápidos</string>
+    <string name="apps_excluded_from_logs">Apps excluidas del registro</string>
+    <string name="all_apps_included">Todas las apps están incluidas</string>
+    <string name="change_history">Historial de cambios</string>
+    <string name="no_changes_yet">Aún no hay cambios</string>
+    <string name="rescan_apps">Reescanear apps</string>
+    <string name="export_settings">Exportar ajustes</string>
+    <string name="export_settings_body">Guarda categorías, reglas y exclusiones en un archivo</string>
+    <string name="import_settings">Importar ajustes</string>
+    <string name="import_settings_body">Restaura desde un archivo de copia de seguridad</string>
+    <string name="material_you">Material You</string>
+    <string name="material_you_body">Usa los colores de tu fondo de pantalla en vez de la paleta de la app</string>
+    <string name="version_line_fmt">Versión %1$s · Todo se queda en este dispositivo</string>
+    <string name="import_confirm_title">¿Importar ajustes?</string>
+    <string name="import_confirm_body">Sustituye tus categorías, reglas, exclusiones y apariencia actuales por las del archivo de copia de seguridad.</string>
+
+    <string name="quiet_hours">Horas de silencio</string>
+    <string name="use_quiet_hours">Usar horas de silencio</string>
+    <string name="use_quiet_hours_body">Se aplica solo dentro de la franja horaria de abajo</string>
+    <string name="starts">Empieza</string>
+    <string name="ends">Termina</string>
+    <string name="overnight">Cruza la medianoche.</string>
+    <string name="no_days_hint">Sin días elegidos se aplica todos los días.</string>
+    <string name="days_picked_hint">Solo los días elegidos arriba.</string>
+    <string name="starts_at">Empieza a las</string>
+    <string name="ends_at">Termina a las</string>
+    <string name="day_mon">lun</string>
+    <string name="day_tue">mar</string>
+    <string name="day_wed">mié</string>
+    <string name="day_thu">jue</string>
+    <string name="day_fri">vie</string>
+    <string name="day_sat">sáb</string>
+    <string name="day_sun">dom</string>
+
+    <string name="change_history_empty_body">Cada cambio que hagas aparece aquí y se puede deshacer.</string>
+
+    <string name="exclusions_body">Las notificaciones de las apps excluidas no se guardan. Activar una exclusión también elimina el historial existente de esa app.</string>
+    <string name="search_installed_apps">Buscar apps instaladas</string>
+    <string name="chip_excluded_only">Solo excluidas</string>
+    <string name="apps_not_loaded">Apps sin cargar</string>
+    <string name="apps_not_loaded_body">Vuelve al registro y reescanea las apps instaladas.</string>
+    <string name="no_apps_found">No se encontraron apps</string>
+    <string name="no_apps_found_body">Prueba otra búsqueda.</string>
+
+    <string name="cd_rescan">Reescanear</string>
+    <string name="scanning_apps">Escaneando tus apps…</string>
+    <string name="empty_home_title">Nada por aquí todavía</string>
+    <string name="empty_home_body">Toca actualizar para escanear tus apps.</string>
+    <string name="of_fmt">%1$d de %2$d</string>
+    <string name="block_all_fmt">¿Bloquear todas las de %1$s?</string>
+    <string name="cd_open_logs">Abrir el registro</string>
+    <string name="stat_arrived">recibidas</string>
+    <string name="stat_kept_out">retenidas</string>
+    <string name="noisiest_fmt">La más ruidosa · %1$s · %2$d</string>
+    <string name="new_fmt">nuevas: %1$s</string>
+    <string name="off_for_every_app">Desactivado en todas las apps</string>
+    <string name="new_channels_when">Cuando una app añada una en esta categoría</string>
+    <string name="quiet_hours_body">Aplica el bloqueo solo a ciertas horas</string>
+    <string name="blocking_pauses_fmt">El bloqueo se pausa fuera de %1$s</string>
+    <string name="no_channels_match">Ningún canal coincide con este filtro.</string>
+    <string name="select_all">Seleccionar todo</string>
+    <string name="cd_clear_selection">Quitar la selección</string>
+    <string name="quiet_hours_for_fmt">Horas de silencio de %1$s</string>
+
+    <string name="finish_to_continue">Completa los dos pasos para continuar</string>
+    <string name="setup_tagline">Ordena tus notificaciones por lo que tratan</string>
+    <string name="setup_connect">Conectar</string>
+    <string name="setup_connect_body">Android solo permite que ayudantes de confianza cambien los ajustes de notificación de otras apps. Dos pasos rápidos, sin root.</string>
+    <string name="setup_step1">Permitir el acceso a las notificaciones</string>
+    <string name="setup_step2">Vincular con un dispositivo cercano</string>
+    <string name="restricted_hint">¿Interruptor en gris? Abre Información de la app → ⋮ → Permitir ajustes restringidos y vuelve a intentarlo.</string>
+    <string name="app_info">Información de la app</string>
+    <string name="pairing_hint">Elige cualquier dispositivo Bluetooth o red Wi-Fi. Solo desbloquea los controles de canales de Android. No se envía nada a él.</string>
+    <string name="bullet1">Cada notificación se registra durante 7 días. Las bloqueadas se ocultan al llegar y quedan marcadas en el registro.</string>
+    <string name="bullet2">Las categorías ya desactivadas en los ajustes de Android se adoptan, y también se registran.</string>
+    <string name="bullet3">Las apps con el interruptor principal de notificaciones apagado no se pueden registrar. Actívalo y bloquea sus categorías aquí.</string>
+    <string name="bullet4">Las reglas eliminan las notificaciones coincidentes al llegar, así que pueden verse un instante.</string>
+    <string name="hide_emulator_commands">Ocultar comandos del emulador</string>
+    <string name="testing_on_emulator">¿Pruebas en un emulador?</string>
+    <string name="run_from_computer">Ejecuta desde tu ordenador:</string>
+    <string name="cd_done">Hecho</string>
+    <string name="err_pairing_unavailable">El emparejamiento de dispositivos no está disponible en este teléfono</string>
+    <string name="err_pairing_failed">Error al vincular</string>
+
+    <string name="tile_pause">Pausar bloqueo</string>
+    <string name="tile_paused">Bloqueo en pausa</string>
+    <string name="tile_active">Bloqueo activo</string>
+    <string name="widget_label">Notificaciones bloqueadas</string>
+    <string name="widget_title">Bloqueadas</string>
+    <string name="widget_empty">Aún no hay notificaciones bloqueadas</string>
+
+    <string name="msg_already_allowed">Ya estaban permitidas</string>
+    <string name="nothing_changed">Nada cambió</string>
+    <string name="skipped_fmt"> · %1$d no se pudieron cambiar</string>
+    <string name="all_channels">Todos los canales</string>
+    <string name="undone">Deshecho</string>
+    <string name="verb_restored">Restaurado</string>
+    <string name="err_category_unavailable">Esa categoría ya no está disponible</string>
+    <string name="msg_paused_on">Bloqueo en pausa — las notificaciones se muestran con normalidad</string>
+    <string name="msg_paused_off">Bloqueo reanudado</string>
+    <string name="err_open_file">No se pudo abrir el archivo</string>
+    <string name="msg_settings_exported">Ajustes exportados</string>
+    <string name="msg_history_exported_csv">Historial exportado como CSV</string>
+    <string name="msg_history_exported_json">Historial exportado como JSON</string>
+    <string name="err_file_too_large">El archivo es demasiado grande</string>
+    <string name="err_read_file">No se pudo leer el archivo</string>
+    <string name="err_not_sift_file">No es un archivo de ajustes de Sift</string>
+    <string name="msg_applying_import">Aplicando los ajustes importados…</string>
+    <string name="msg_settings_imported">Ajustes importados</string>
+    <string name="msg_appdefault_keep">Los canales nuevos de %1$s mantendrán sus propios ajustes</string>
+    <string name="msg_appdefault_willbe">Los canales nuevos de %1$s serán %2$s</string>
+    <string name="msg_qh_off_fmt">Horas de silencio desactivadas para %1$s</string>
+    <string name="msg_qh_on_fmt">Horas de silencio de %1$s · %2$s</string>
+
+    <plurals name="apps_count">
+        <item quantity="one">%1$d app</item>
+        <item quantity="other">%1$d apps</item>
+    </plurals>
+    <plurals name="channels_count">
+        <item quantity="one">%1$d canal</item>
+        <item quantity="other">%1$d canales</item>
+    </plurals>
+    <plurals name="blocked_count">
+        <item quantity="one">%1$d bloqueada</item>
+        <item quantity="other">%1$d bloqueadas</item>
+    </plurals>
+    <plurals name="silent_count">
+        <item quantity="one">%1$d silenciosa</item>
+        <item quantity="other">%1$d silenciosas</item>
+    </plurals>
+    <plurals name="shown_count">
+        <item quantity="one">%1$d mostrada</item>
+        <item quantity="other">%1$d mostradas</item>
+    </plurals>
+    <plurals name="notifications_count">
+        <item quantity="one">%1$d notificación</item>
+        <item quantity="other">%1$d notificaciones</item>
+    </plurals>
+    <plurals name="changes_count">
+        <item quantity="one">%1$d cambio que puedes deshacer</item>
+        <item quantity="other">%1$d cambios que puedes deshacer</item>
+    </plurals>
+    <plurals name="excluded_apps_count">
+        <item quantity="one">%1$d app excluida</item>
+        <item quantity="other">%1$d apps excluidas</item>
+    </plurals>
+    <plurals name="excluded_count">
+        <item quantity="one">%1$d excluida</item>
+        <item quantity="other">%1$d excluidas</item>
+    </plurals>
+    <plurals name="apps_scanned_count">
+        <item quantity="one">%1$d app escaneada</item>
+        <item quantity="other">%1$d apps escaneadas</item>
+    </plurals>
+    <plurals name="msg_scanned">
+        <item quantity="one">Se escaneó %1$d app</item>
+        <item quantity="other">Se escanearon %1$d apps</item>
+    </plurals>
+    <plurals name="search_apps">
+        <item quantity="one">Buscar en %1$d app</item>
+        <item quantity="other">Buscar en %1$d apps</item>
+    </plurals>
+    <plurals name="create_rule_words">
+        <item quantity="one">Crear regla con %1$d palabra</item>
+        <item quantity="other">Crear regla con %1$d palabras</item>
+    </plurals>
+    <plurals name="would_catch">
+        <item quantity="one">Habría capturado %1$d notificación del registro</item>
+        <item quantity="other">Habría capturado %1$d notificaciones del registro</item>
+    </plurals>
+    <plurals name="selected_count">
+        <item quantity="one">%1$d seleccionada</item>
+        <item quantity="other">%1$d seleccionadas</item>
+    </plurals>
+    <plurals name="widget_count">
+        <item quantity="one">%1$d en 7 días</item>
+        <item quantity="other">%1$d en 7 días</item>
+    </plurals>
+    <plurals name="block_confirm">
+        <item quantity="one">%2$s de %1$d app se ocultarán y se guardarán en el registro. Puedes deshacerlo.</item>
+        <item quantity="other">%2$s de %1$d apps se ocultarán y se guardarán en el registro. Puedes deshacerlo.</item>
+    </plurals>
+</resources>

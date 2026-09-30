@@ -42,10 +42,12 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.sift.App
+import app.sift.R
 import app.sift.data.Category
 import app.sift.data.Schedule
 import app.sift.data.ThemeMode
@@ -85,12 +87,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class Tab(val label: String, val icon: ImageVector, val selectedIcon: ImageVector) {
-    CATEGORIES("Categories", Icons.Outlined.Category, Icons.Filled.Category),
-    APPS("Apps", Icons.Outlined.Apps, Icons.Filled.Apps),
-    LOGS("Logs", Icons.Outlined.Inbox, Icons.Filled.Inbox),
-    RULES("Rules", Icons.Outlined.FilterAlt, Icons.Filled.FilterAlt),
-    SETTINGS("Settings", Icons.Outlined.Settings, Icons.Filled.Settings),
+enum class Tab(val labelRes: Int, val icon: ImageVector, val selectedIcon: ImageVector) {
+    CATEGORIES(R.string.tab_categories, Icons.Outlined.Category, Icons.Filled.Category),
+    APPS(R.string.tab_apps, Icons.Outlined.Apps, Icons.Filled.Apps),
+    LOGS(R.string.tab_logs, Icons.Outlined.Inbox, Icons.Filled.Inbox),
+    RULES(R.string.tab_rules, Icons.Outlined.FilterAlt, Icons.Filled.FilterAlt),
+    SETTINGS(R.string.tab_settings, Icons.Outlined.Settings, Icons.Filled.Settings),
 }
 
 /** Minimal back stack: routes are "category/NAME", "app/PKG", "history", "setup". */
@@ -131,6 +133,7 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
         uri?.let(vm::exportHistoryJsonTo)
     }
 
+    val undoLabel = stringResource(R.string.action_undo)
     LaunchedEffect(Unit) {
         var showing: Job? = null
         vm.message.filterNotNull().collect { m ->
@@ -145,7 +148,7 @@ fun AppRoot(vm: MainViewModel = viewModel()) {
                     // Material's Long is 10s, which reads as stuck. Indefinite plus our own
                     // timeout gives an undo window long enough to use but short enough to ignore.
                     withTimeoutOrNull(UNDO_MILLIS) {
-                        snackbar.showSnackbar(m.text, "Undo", duration = SnackbarDuration.Indefinite)
+                        snackbar.showSnackbar(m.text, undoLabel, duration = SnackbarDuration.Indefinite)
                     }
                 } else {
                     snackbar.showSnackbar(m.text, duration = SnackbarDuration.Short)

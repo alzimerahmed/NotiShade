@@ -55,11 +55,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.sift.App
 import app.sift.BuildConfig
+import app.sift.R
 import app.sift.backend.AccessState
 import app.sift.service.NotifListener
 
@@ -80,7 +82,7 @@ fun SetupScreen(
             if (onBack != null) {
                 TopAppBar(
                     title = {},
-                    navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+                    navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back)) } },
                 )
             }
         },
@@ -93,7 +95,7 @@ fun SetupScreen(
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         shape = RoundedCornerShape(16.dp),
                     ) {
-                        Text(if (access.configured) "Continue" else "Finish both steps to continue")
+                        Text(if (access.configured) stringResource(R.string.action_continue) else stringResource(R.string.finish_to_continue))
                     }
                 }
             }
@@ -108,7 +110,7 @@ fun SetupScreen(
                     BrandMark(72.dp)
                     Wordmark(MaterialTheme.typography.headlineLarge, Modifier.padding(top = 18.dp))
                     Text(
-                        "Sort your notifications by what they\u2019re about",
+                        stringResource(R.string.setup_tagline),
                         Modifier.padding(top = 4.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -116,9 +118,9 @@ fun SetupScreen(
                     )
                 }
             }
-            Text("Connect", style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.setup_connect), style = MaterialTheme.typography.headlineSmall)
             Text(
-                "Android only lets trusted helpers change other apps\u2019 notification settings. Two quick steps, no root needed.",
+                stringResource(R.string.setup_connect_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -133,41 +135,41 @@ fun SetupScreen(
                 ),
             ) {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Step(1, "Allow notification access", access.listenerGranted) {
-                        StepAction("Allow") { openListenerSettings(ctx) }
+                    Step(1, stringResource(R.string.setup_step1), access.listenerGranted) {
+                        StepAction(stringResource(R.string.action_allow)) { openListenerSettings(ctx) }
                     }
                     if (!access.listenerGranted) {
-                        Hint("Switch greyed out? Open App info → ⋮ → Allow restricted settings, then try again.")
-                        TextButton(onClick = { openAppInfo(ctx) }) { Text("App info") }
+                        Hint(stringResource(R.string.restricted_hint))
+                        TextButton(onClick = { openAppInfo(ctx) }) { Text(stringResource(R.string.app_info)) }
                     }
-                    Step(2, "Pair with a nearby device", access.companionPaired) {
-                        StepAction("Pair") { pair(ctx, pairLauncher, vm::say) }
+                    Step(2, stringResource(R.string.setup_step2), access.companionPaired) {
+                        StepAction(stringResource(R.string.action_pair)) { pair(ctx, pairLauncher, vm::say) }
                     }
                     if (!access.companionPaired) {
-                        Hint("Choose any Bluetooth device or Wi-Fi network. It only unlocks Android's channel controls. Nothing is sent to it.")
+                        Hint(stringResource(R.string.pairing_hint))
                     }
                 }
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    "GOOD TO KNOW",
+                    stringResource(R.string.label_good_to_know),
                     Modifier.padding(top = 8.dp),
                     style = OvertypeLabel,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Bullet("Every notification is logged for 7 days. Blocked ones are hidden as they arrive and marked in Logs.")
-                Bullet("Categories already off in Android Settings are taken over, so they're logged too.")
-                Bullet("Apps whose main notification switch is off can't be logged. Turn it on and block their categories here instead.")
-                Bullet("Rules remove matching notifications as they arrive, so they may appear for a moment.")
+                Bullet(stringResource(R.string.bullet1))
+                Bullet(stringResource(R.string.bullet2))
+                Bullet(stringResource(R.string.bullet3))
+                Bullet(stringResource(R.string.bullet4))
             }
 
             if (BuildConfig.DEBUG) {
-                TextButton(onClick = { showAdb = !showAdb }) { Text(if (showAdb) "Hide emulator commands" else "Testing on an emulator?") }
+                TextButton(onClick = { showAdb = !showAdb }) { Text(if (showAdb) stringResource(R.string.hide_emulator_commands) else stringResource(R.string.testing_on_emulator)) }
             }
             if (BuildConfig.DEBUG && showAdb) {
                 val p = ctx.packageName
-                Hint("Run from your computer:")
+                Hint(stringResource(R.string.run_from_computer))
                 SelectionContainer {
                     Text(
                         "adb shell cmd notification allow_listener $p/${NotifListener::class.java.name}\n" +
@@ -202,7 +204,7 @@ private fun Step(number: Int, title: String, done: Boolean, action: @Composable 
             contentAlignment = Alignment.Center,
         ) {
             if (done) {
-                Icon(Icons.Default.Check, "Done", Modifier.size(15.dp), tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(Icons.Default.Check, stringResource(R.string.cd_done), Modifier.size(15.dp), tint = MaterialTheme.colorScheme.onPrimary)
             } else {
                 Text(
                     "$number",
@@ -248,7 +250,7 @@ private fun openAppInfo(ctx: Context) {
 
 private fun pair(ctx: Context, launcher: ActivityResultLauncher<IntentSenderRequest>, onError: (String) -> Unit) {
     val cdm = ctx.getSystemService(CompanionDeviceManager::class.java)
-        ?: return onError("Device pairing isn't available on this phone")
+        ?: return onError(ctx.getString(R.string.err_pairing_unavailable))
     val request = AssociationRequest.Builder()
         .addDeviceFilter(BluetoothDeviceFilter.Builder().build())
         .addDeviceFilter(WifiDeviceFilter.Builder().build())
@@ -264,7 +266,7 @@ private fun pair(ctx: Context, launcher: ActivityResultLauncher<IntentSenderRequ
         }
 
         override fun onFailure(error: CharSequence?) {
-            onError(error?.toString() ?: "Pairing failed")
+            onError(error?.toString() ?: ctx.getString(R.string.err_pairing_failed))
         }
     })
 }

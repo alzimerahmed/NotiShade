@@ -20,8 +20,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.sift.R
 import app.sift.data.AppInfo
 
 @Composable
@@ -38,16 +40,16 @@ fun LogExclusionsScreen(
             (query.isBlank() || app.label.contains(query, ignoreCase = true) || app.pkg.contains(query, ignoreCase = true))
     }
 
-    DetailScaffold("Apps excluded from Logs", nav::back) {
+    DetailScaffold(stringResource(R.string.apps_excluded_from_logs), nav::back) {
         Column {
             Text(
-                "Excluded apps' notifications aren't saved. Enabling an exclusion also removes that app's existing history.",
+                stringResource(R.string.exclusions_body),
                 Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             SearchField(
-                query, { query = it }, "Search installed apps",
+                query, { query = it }, stringResource(R.string.search_installed_apps),
                 Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             )
             Row(
@@ -55,19 +57,19 @@ fun LogExclusionsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                QuietChip("Excluded only", excludedOnly) { excludedOnly = !excludedOnly }
+                QuietChip(stringResource(R.string.chip_excluded_only), excludedOnly) { excludedOnly = !excludedOnly }
                 Text(
-                    "${excluded.size} excluded",
+                    pluralResource(R.plurals.excluded_count, excluded.size),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             if (apps.isEmpty()) {
-                EmptyState("Apps not loaded", "Return to Logs and rescan installed apps.")
+                EmptyState(stringResource(R.string.apps_not_loaded), stringResource(R.string.apps_not_loaded_body))
                 return@Column
             }
             if (shown.isEmpty()) {
-                EmptyState("No apps found", "Try another search.")
+                EmptyState(stringResource(R.string.no_apps_found), stringResource(R.string.no_apps_found_body))
                 return@Column
             }
             LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {

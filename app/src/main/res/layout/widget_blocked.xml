@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Blocked"
+            android:text="@string/widget_title"
             android:textColor="#E6E0E9"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="No blocked notifications yet"
+        android:text="@string/widget_empty"
         android:textColor="#CAC4D0"
         android:textSize="13sp"
         android:visibility="gone" />

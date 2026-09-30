@@ -78,6 +78,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -86,11 +87,10 @@ import androidx.core.graphics.drawable.toBitmap
 import app.sift.data.Category
 import app.sift.data.ChannelAction
 import app.sift.data.ChannelInfo
-import app.sift.data.importanceLabel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-enum class Status(val label: String) { ALLOWED("Allowed"), SILENT("Silent"), BLOCKED("Blocked") }
+enum class Status(val labelRes: Int) { ALLOWED(R.string.status_allowed), SILENT(R.string.status_silent), BLOCKED(R.string.status_blocked) }
 
 fun statusOf(importance: Int) = when (importance) {
     NotificationManager.IMPORTANCE_NONE -> Status.BLOCKED
@@ -100,10 +100,21 @@ fun statusOf(importance: Int) = when (importance) {
 
 fun ChannelInfo.status() = if (logged) Status.BLOCKED else statusOf(channel.importance)
 
-fun ChannelInfo.behaviorLabel() = when {
-    logged -> "Blocked"
-    channel.importance == NotificationManager.IMPORTANCE_NONE -> "Blocked · not logged"
-    else -> importanceLabel(channel.importance)
+@Composable
+fun ChannelInfo.behaviorLabel(): String = when {
+    logged -> stringResource(R.string.status_blocked)
+    channel.importance == NotificationManager.IMPORTANCE_NONE -> stringResource(R.string.status_blocked_not_logged)
+    else -> importanceLabelRes(channel.importance)
+}
+
+@Composable
+private fun importanceLabelRes(importance: Int): String = when (importance) {
+    NotificationManager.IMPORTANCE_NONE -> stringResource(R.string.status_blocked)
+    NotificationManager.IMPORTANCE_MIN -> stringResource(R.string.imp_minimized)
+    NotificationManager.IMPORTANCE_LOW -> stringResource(R.string.status_silent)
+    NotificationManager.IMPORTANCE_DEFAULT -> stringResource(R.string.imp_alerting)
+    NotificationManager.IMPORTANCE_HIGH, NotificationManager.IMPORTANCE_MAX -> stringResource(R.string.imp_popup)
+    else -> stringResource(R.string.imp_unspecified)
 }
 
 fun ChannelInfo.isCurrent(a: ChannelAction) = when (a) {
@@ -113,14 +124,18 @@ fun ChannelInfo.isCurrent(a: ChannelAction) = when (a) {
 }
 
 /** "3 blocked · 2 silent", or "All allowed". */
+@Composable
 fun statusSummary(channels: Collection<ChannelInfo>): String {
     val blocked = channels.count { it.status() == Status.BLOCKED }
     val silent = channels.count { it.status() == Status.SILENT }
     return buildList {
-        if (blocked > 0) add("$blocked blocked")
-        if (silent > 0) add("$silent silent")
-    }.joinToString(" · ").ifEmpty { "All allowed" }
+        if (blocked > 0) add(pluralResource(R.plurals.blocked_count, blocked))
+        if (silent > 0) add(pluralResource(R.plurals.silent_count, silent))
+    }.joinToString(" · ").ifEmpty { stringResource(R.string.all_allowed) }
 }
+
+/** pluralResource helper lives in Strings.kt */
+
 
 // Only "blocked" earns a hue. Allowed and silent are both ordinary states, so they are told
 // apart by the dot - hollow versus filled - rather than by colour alone.
@@ -315,7 +330,7 @@ fun SearchField(
         leadingIcon = { Icon(Icons.Outlined.Search, null, Modifier.size(20.dp)) },
         trailingIcon = {
             if (value.isNotEmpty()) {
-                IconButton(onClick = { onValueChange("") }) { Icon(Icons.Outlined.Close, "Clear", Modifier.size(20.dp)) }
+                IconButton(onClick = { onValueChange("") }) { Icon(Icons.Outlined.Close, stringResource(R.string.cd_clear), Modifier.size(20.dp)) }
             }
         },
         singleLine = true,
@@ -388,7 +403,7 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier) {
 fun clearListItem(): ListItemColors = ListItemDefaults.colors(containerColor = Color.Transparent)
 
 @Composable
-fun <T> PickerButton(text: String, options: List<T>, optionLabel: (T) -> String, onPick: (T) -> Unit) {
+fun <T> PickerButton(text: String, options: List<T>, optionLabel: @Composable (T) -> String, onPick: (T) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         TextButton(onClick = { open = true }) { Text(text) }
@@ -423,7 +438,7 @@ fun TabScaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             LargeTopAppBar(
-                title = { Text(tab.label) },
+                title = { Text(stringResource(tab.labelRes)) },
                 actions = actions,
                 scrollBehavior = scroll,
                 colors = flatTopBarColors(),
@@ -441,7 +456,7 @@ fun TabScaffold(
                             selected = t == tab,
                             onClick = { onTab(t) },
                             icon = { Icon(if (t == tab) t.selectedIcon else t.icon, null, Modifier.size(22.dp)) },
-                            label = { Text(t.label, style = MaterialTheme.typography.labelSmall) },
+                            label = { Text(stringResource(t.labelRes), style = MaterialTheme.typography.labelSmall) },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.onSurface,
                                 selectedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -486,7 +501,7 @@ fun DetailScaffold(
         topBar = {
             TopAppBar(
                 title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back)) } },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     scrolledContainerColor = MaterialTheme.colorScheme.surface,

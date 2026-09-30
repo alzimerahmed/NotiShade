@@ -37,7 +37,7 @@ class BlockedWidgetProvider : AppWidgetProvider() {
             val blocked = App.of(context).history.entries.value.filter { it.outcome != Outcome.SHOWN }
             val rv = RemoteViews(context.packageName, R.layout.widget_blocked)
             rv.removeAllViews(R.id.widget_list)
-            rv.setTextViewText(R.id.widget_count, if (blocked.isEmpty()) "" else "${blocked.size} in 7 days")
+            rv.setTextViewText(R.id.widget_count, if (blocked.isEmpty()) "" else context.resources.getQuantityString(R.plurals.widget_count, blocked.size, blocked.size))
             if (blocked.isEmpty()) {
                 rv.setViewVisibility(R.id.widget_list, android.view.View.GONE)
                 rv.setViewVisibility(R.id.widget_empty, android.view.View.VISIBLE)
@@ -58,6 +58,7 @@ class BlockedWidgetProvider : AppWidgetProvider() {
             val intent = Intent(context, MainActivity::class.java)
             val pi = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             rv.setOnClickPendingIntent(R.id.widget_root, pi)
+            rv.setContentDescription(R.id.widget_root, context.getString(R.string.widget_label))
             manager.updateAppWidget(ids, rv)
         }
     }
