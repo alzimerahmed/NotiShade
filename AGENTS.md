@@ -64,6 +64,7 @@ Sift = on-device Android notification category manager (repo: https://github.com
 - **Write tests** for new engine/data behavior (behavior, not implementation).
 - **Conventional Commits**: `type(scope): description`.
 - **Respect module simplicity** — single-module app; don't propose feature modules without a decision record.
+- **Plan discipline** — `docs/plan.md` must contain a Quality Gate (security/perf/a11y/anti-vibe audits) and a Release phase, not just feature phases. Every `idea.md` Feature Gap entry maps to a phase or is explicitly deferred — no silent drops. When a phase answers an open question in `docs/research.md`, close it there in the same change.
 
 ### Don'ts
 - **NO local builds or test runs** — verification is CI-only (user directive).
