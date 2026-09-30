@@ -67,7 +67,7 @@ class HistoryCodecTest {
     fun `csv quoting survives carriage returns and trailing commas`() {
         val tricky = "line1\r\nline2, with \"quotes\" and, commas"
         val row = dataRow(HistoryCodec.encodeCsv(listOf(entry(text = tricky))))
-        assertTrue(row.startsWith("2023-11-14T22:13:20Z,key-1,com.example.mail,Mail,promo,Promotions,Hello,"))
+        assertTrue(row.startsWith("2023-11-14T22:13:20Z,key-1,com.example.mail,Mail,promo,Promotions,PROMO,Hello,"))
         assertTrue(row.endsWith("\"line1\r\nline2, with \"\"quotes\"\" and, commas\",BLOCKED,"))
     }
 
