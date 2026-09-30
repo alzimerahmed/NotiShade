@@ -25,19 +25,7 @@ class HistoryStore(context: Context, private val scope: CoroutineScope) {
 
     /** [inPlace] keeps an updating notification (music, navigation) at its original spot instead of moving it up. */
     fun record(e: HistoryEntry, inPlace: Boolean = false) {
-        _entries.update { list ->
-            val index = list.indexOfFirst { it.key == e.key }
-            val prev = list.getOrNull(index)
-            val rest = when {
-                prev == null -> list
-                prev.title == e.title && prev.text == e.text && prev.outcome == e.outcome -> return@update list
-                inPlace -> return@update list.toMutableList().also { it[index] = e.copy(time = prev.time) }
-                // Rapid updates of the same notification (e.g. progress) replace the previous entry.
-                e.time - prev.time < 60_000 -> list - prev
-                else -> list
-            }
-            (listOf(e) + rest).trimmed()
-        }
+        _entries.update { list -> HistoryLogic.merge(list, e, inPlace)?.trimmed() ?: list }
         scheduleSave()
     }
 
@@ -56,10 +44,7 @@ class HistoryStore(context: Context, private val scope: CoroutineScope) {
         scheduleSave()
     }
 
-    private fun List<HistoryEntry>.trimmed(): List<HistoryEntry> {
-        val cutoff = System.currentTimeMillis() - RETENTION_MS
-        return filter { it.time >= cutoff }.take(MAX_ENTRIES)
-    }
+    private fun List<HistoryEntry>.trimmed() = HistoryLogic.trim(this, System.currentTimeMillis())
 
     // Batches writes so a burst of notifications costs one disk write.
     private fun scheduleSave() {
@@ -82,10 +67,5 @@ class HistoryStore(context: Context, private val scope: CoroutineScope) {
         } catch (e: Exception) {
             file.failWrite(out)
         }
-    }
-
-    private companion object {
-        const val RETENTION_MS = 7L * 24 * 60 * 60 * 1000
-        const val MAX_ENTRIES = 5_000
     }
 }

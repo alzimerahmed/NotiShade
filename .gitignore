@@ -14,3 +14,10 @@ local.properties
 *.jks
 *.keystore
 keystore.properties
+
+# Private agent system + per-project knowledge layer (never pushed).
+.devin/
+docs/*.md
+
+# Local agent scratch state.
+.switchboard/

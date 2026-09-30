@@ -13,7 +13,6 @@ import app.sift.data.Category
 import app.sift.data.Classifier
 import app.sift.data.HistoryEntry
 import app.sift.data.Outcome
-import app.sift.data.Rule
 import app.sift.data.RuleAction
 import app.sift.data.keyOf
 import kotlinx.coroutines.launch
@@ -69,7 +68,12 @@ class NotifListener : NotificationListenerService() {
         }
         if (!worthLogging(sbn)) return
 
-        val rule = if (clearable) matchRule(d.rules, sbn) else null
+        val rule = if (clearable) {
+            val extras = sbn.notification.extras
+            RuleMatcher.match(d.rules, sbn.packageName, textKeys.map { extras.getCharSequence(it) })
+        } else {
+            null
+        }
         when {
             rule != null -> {
                 when (rule.action) {
@@ -100,16 +104,6 @@ class NotifListener : NotificationListenerService() {
     private fun channelOf(sbn: StatusBarNotification, rankingMap: RankingMap?): NotificationChannel? {
         val r = Ranking()
         return if (rankingMap?.getRanking(sbn.key, r) == true) r.channel else null
-    }
-
-    private fun matchRule(rules: List<Rule>, sbn: StatusBarNotification): Rule? {
-        if (rules.none { it.enabled }) return null
-        val extras = sbn.notification.extras
-        val text = textKeys.mapNotNull { extras.getCharSequence(it) }.joinToString(" ")
-        return rules.firstOrNull { r ->
-            r.enabled && (r.pkg.isNullOrBlank() || r.pkg == sbn.packageName) &&
-                r.keywords.any { it.isNotBlank() && text.contains(it.trim(), ignoreCase = true) }
-        }
     }
 
     private fun record(

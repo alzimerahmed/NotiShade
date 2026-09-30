@@ -56,4 +56,20 @@ class ClassifierTest {
     @Test fun camelCaseIdsAreSplit() {
         assertEquals(Category.PROMO, category("", id = "marketingPush"))
     }
+
+    @Test fun longerKeywordsMatchWordPrefixes() {
+        assertEquals(Category.PROMO, category("Offers from stores"))
+        assertEquals(Category.ORDERS, category("Order tracking"))
+    }
+
+    @Test fun descriptionsAndGroupNamesAreConsidered() {
+        assertEquals(
+            Category.PAYMENTS,
+            Classifier.classify("alerts", "Alerts", "Billing and invoices", "Money", conversation = false, hints = emptySet()).first,
+        )
+    }
+
+    @Test fun nullNameWithNeutralIdIsOther() {
+        assertEquals(Category.OTHER, Classifier.classify("general", null, null, null, conversation = false, hints = emptySet()).first)
+    }
 }
